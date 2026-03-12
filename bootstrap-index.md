@@ -11,27 +11,37 @@
 
 ## How This Works
 
-When a conversation requires a protocol or template, **fetch it from the metarepo**
-using `web_fetch` on the raw GitHub URL. This ensures every conversation uses the
-latest version without manual syncing.
+When a conversation requires a protocol or template, **clone the metarepo once**
+at the start of the conversation and read files locally. This ensures every
+conversation uses the latest version without manual syncing.
 
-**Fetch pattern:**
-```
-web_fetch: https://raw.githubusercontent.com/stevengizzi/claude-workflow/main/{path}
+**Clone pattern (run once per conversation):**
+```bash
+git clone https://github.com/stevengizzi/claude-workflow.git /home/claude/workflow
 ```
 
-**When to fetch:** At the start of the conversation, once the conversation type is
-identified. Fetch only what's needed for the current conversation type.
+**Then read files with:**
+```
+view /home/claude/workflow/{path}
+```
+
+This clones the entire repo in one network call. All subsequent reads are local
+file operations — no additional fetches needed. The clone lives only for the
+duration of the conversation; each new conversation gets a fresh copy.
+
+**When to clone:** At the start of the conversation, once the conversation type
+is identified. Clone the repo, then read only the files needed for the current
+conversation type.
 
 ---
 
-## Conversation Type → What to Fetch
+## Conversation Type → What to Read
 
 ### Sprint Planning
-Fetch first:
+Read first:
 - `protocols/sprint-planning.md`
 
-Fetch during artifact generation (Phase C/D):
+Read during artifact generation (Phase C/D):
 - `templates/sprint-spec.md`
 - `templates/design-summary.md`
 - `templates/spec-by-contradiction.md`
@@ -114,7 +124,7 @@ Fetch during artifact generation (Phase C/D):
 
 ## Version Tracking
 
-When fetching a protocol, note the version header if present:
+When reading a protocol, note the version header if present:
 ```
 <!-- workflow-version: X.Y.Z -->
 <!-- last-updated: YYYY-MM-DD -->
