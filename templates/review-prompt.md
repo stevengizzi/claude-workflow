@@ -12,13 +12,20 @@ in the Review Context File and is referenced by path -- not duplicated here.
 
     ## Instructions
     You are conducting a Tier 2 code review. This is a READ-ONLY session.
-    Do NOT modify any files.
+    Do NOT modify any source code files.
 
     Follow the review skill in .claude/skills/review.md.
 
     Your review report MUST include a structured JSON verdict at the end,
     fenced with ```json:structured-verdict. See the review skill for the
     full schema and requirements.
+
+    **Write the review report to a file** (DEC-330):
+    docs/sprints/sprint-[N]/session-[M]-review.md
+
+    Create the file, write the full report (including the structured JSON
+    verdict) to it, and commit it. This is the ONE exception to "do not
+    modify any files" — the review report file is the sole permitted write.
 
     ## Review Context
     Read the following file for the Sprint Spec, Specification by Contradiction,
@@ -27,7 +34,14 @@ in the Review Context File and is referenced by path -- not duplicated here.
     [path to review-context.md]
 
     ## Tier 1 Close-Out Report
-    [PASTE THE CLOSE-OUT REPORT HERE AFTER THE IMPLEMENTATION SESSION]
+    Read the close-out report from:
+    docs/sprints/sprint-[N]/session-[M]-closeout.md
+
+    [PLANNING NOTE: When generating review prompts, fill in the actual path
+    with the correct sprint and session numbers. The close-out file is committed
+    by the implementation session per DEC-330. If for any reason the file does
+    not exist, the reviewer should flag this as CONCERNS — the close-out report
+    is required for review.]
 
     ## Review Scope
     - Diff to review: git diff HEAD~1 (or specify the correct range)

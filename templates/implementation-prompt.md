@@ -124,6 +124,13 @@ front-load context, constrain scope, and end with the close-out skill invocation
     fenced with ```json:structured-closeout. See the close-out skill for the
     full schema and requirements.
 
+    **Write the close-out report to a file** (DEC-330):
+    docs/sprints/sprint-[N]/session-[M]-closeout.md
+
+    Do NOT just print the report in the terminal. Create the file, write the
+    full report (including the structured JSON appendix) to it, and commit it.
+    The Tier 2 reviewer will read this file by path.
+
     [OPTIONAL: After close-out, invoke the reviewer subagent:
     @reviewer -- provide the sprint spec, close-out report, and the regression
     checklist below.]
