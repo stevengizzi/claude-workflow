@@ -231,6 +231,14 @@ With finalized spec-level artifacts in hand, generate prompts:
       config file and verifies all keys under the new section are recognized
       by the Pydantic model (no silently ignored fields)."
 
+      If the sprint has multiple sessions, apply test suite tiering (DEC-328):
+      - Session 1 pre-flight: full suite with `-n auto`
+      - Session 2+ pre-flights: scoped test command for that session's modules
+      - All close-outs: full suite with `-n auto` (handled by close-out skill)
+      - Non-final reviews: scoped test command
+      - Final review: full suite with `-n auto`
+      This reduces full suite runs from 3× per session to ~4 total per sprint.
+
    b. **Tier 2 Review Prompt** (using templates/review-prompt.md) -- a
       **small, session-specific file** that:
       - Points Claude Code to the Review Context File by path

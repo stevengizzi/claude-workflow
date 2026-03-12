@@ -31,7 +31,7 @@ in the Review Context File and is referenced by path -- not duplicated here.
 
     ## Review Scope
     - Diff to review: git diff HEAD~1 (or specify the correct range)
-    - Test command: [exact test command]
+    - Test command: [exact test command — see DEC-328 note below]
     - Files that should NOT have been modified: [list]
 
     ## Session-Specific Review Focus
@@ -65,6 +65,15 @@ in the Review Context File and is referenced by path -- not duplicated here.
     CONCERNS (medium issues, may need triage in autonomous mode), and ESCALATE
     (requires human). Session-specific review focus items should cover the
     scenarios most likely to produce CONCERNS for that particular session.]
+
+    [PLANNING NOTE (DEC-328): When generating review prompts:
+      - Non-final reviews (Session 1 of 3, Session 2 of 3): use scoped test
+        command targeting the session's affected modules. The close-out just
+        confirmed full suite pass — re-running full suite in review is redundant.
+      - Final review (last session of sprint): use full suite with `-n auto`.
+        This is the last checkpoint before merge.
+      Example: In a 3-session sprint, Reviews 1 and 2 use scoped commands,
+      Review 3 uses the full suite.]
 
     ## Additional Context
     [Any session-specific context the reviewer needs -- e.g., "This is attempt 2

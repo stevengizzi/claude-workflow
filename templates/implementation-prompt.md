@@ -15,13 +15,26 @@ front-load context, constrain scope, and end with the close-out skill invocation
        - [file path 1]
        - [file path 2]
        - [file path 3]
-    2. Run the test suite: [exact test command]
-       Expected: [N] tests, all passing
+    2. Run the test baseline (DEC-328):
+       [IF Session 1 of sprint]:
+         Full suite: [full test command with -n auto]
+         Expected: [N] tests, all passing
+       [IF Session 2+ of sprint]:
+         Scoped: [scoped test command targeting this session's modules]
+         Expected: all passing (full suite was confirmed by previous close-out)
        Note: In autonomous mode, the expected test count is dynamically adjusted
        by the runner based on the previous session's actual results. The count
        above is the planning-time estimate.
     3. Verify you are on the correct branch: [branch name]
     4. [Any other pre-conditions]
+
+    [PLANNING NOTE (DEC-328): When generating implementation prompts:
+      - Session 1 pre-flight: full suite with `-n auto` for parallel execution
+      - Session 2+ pre-flight: scoped test command targeting only this session's
+      affected modules (e.g., `python -m pytest tests/intelligence/ -x -q`)
+      - ALL close-outs: always full suite with `-n auto`
+      The close-out skill handles its own test invocation — the pre-flight
+      distinction is the only thing the implementation prompt needs to vary.]
 
     ## Objective
     [1-2 sentences: what this session accomplishes]
