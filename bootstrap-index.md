@@ -56,6 +56,7 @@ Read during artifact generation (Phase C/D):
 
 ### In-Flight Triage (Sprint Work Journal)
 - `protocols/in-flight-triage.md`
+- `templates/work-journal-closeout.md` (at sprint close, for generating the handoff)
 
 ### Impromptu Triage (Unplanned Work)
 - `protocols/impromptu-triage.md`
@@ -110,6 +111,7 @@ Read during artifact generation (Phase C/D):
 | Doc-Sync Prompt | `templates/doc-sync-automation-prompt.md` | Runner post-sprint doc sync |
 | Conformance Prompt | `templates/spec-conformance-prompt.md` | Runner conformance checks |
 | Triage Prompt | `templates/tier-2.5-triage-prompt.md` | Runner automated triage |
+| Work Journal Close-Out | `templates/work-journal-closeout.md` | Sprint close (Work Journal conversation) |
 
 ## Schema Index
 

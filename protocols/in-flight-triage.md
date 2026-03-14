@@ -101,6 +101,30 @@ re-scanning."
 
 ---
 
+## DEF/DEC Number Tracking
+
+The Work Journal is the canonical authority for DEF and DEC number assignments
+during a sprint. The sprint handoff reserves number ranges at the start.
+
+**When assigning a DEF number:**
+1. Use the next available number from the reserved range
+2. Log it in the Work Journal's running DEF table with: number, description, status, source session
+3. If the item is resolved during the sprint, mark it as RESOLVED — do NOT delete it
+
+**When tracking a DEC number:**
+1. Log the number, brief description, and source session
+2. The doc-sync session creates the full DEC entry from session close-outs
+
+**At sprint close, the Work Journal must produce a close-out block** following
+the `templates/work-journal-closeout.md` template. This block is pasted into
+the doc-sync prompt so the doc-sync session has full visibility.
+
+The Work Journal close-out prevents the #1 doc-sync failure mode: DEF number
+collisions between the Work Journal's assignments and the doc-sync session's
+independent assignments.
+
+--
+
 ## Work Journal Conversation Format
 
 When bringing an issue to the work journal, include:

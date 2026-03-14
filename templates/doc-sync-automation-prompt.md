@@ -50,6 +50,20 @@ replaced at runtime.
 
     {DEFERRED_OBSERVATIONS_CONTENTS}
 
+    ## Work Journal Close-Out
+    The Work Journal tracked all issues, DEF/DEC assignments, carry-forwards,
+    and resolutions throughout the sprint. Its close-out is the canonical source
+    for DEF number assignments and resolved items.
+
+    **CRITICAL:** If a DEF number appears in this section as RESOLVED, do NOT
+    create an open DEF entry for it in CLAUDE.md.
+
+    **CRITICAL:** If the Work Journal assigned DEF numbers, those assignments
+    take precedence over any numbers the doc-sync session would otherwise assign.
+    Do not re-assign DEF numbers that the Work Journal already allocated.
+
+    {WORK_JOURNAL_CLOSEOUT}
+    
     ## DEC Entries Needed
     These were identified during sessions as needing DEC entries. Draft each
     following the DEC template format in docs/decision-log.md.
@@ -78,6 +92,10 @@ replaced at runtime.
 
     7. **docs/roadmap.md** — Update if sprint outcomes affect future plans.
 
+    8. **Work Journal Close-Out** — If provided, use as source of truth for
+       DEF assignments and resolved items. Cross-reference against all DEF
+       entries created in this session.
+
     {ADDITIONAL_TARGET_DOCUMENTS}
 
     ## Constraints
@@ -87,6 +105,13 @@ replaced at runtime.
       human review rather than guessing
     - Preserve existing document formatting and conventions
     - For DEC entries: use the next sequential number after {CURRENT_MAX_DEC}
+    - If the Work Journal Close-Out is provided, use its DEF number assignments
+      as canonical. Do NOT assign new DEF numbers that conflict with Work Journal
+      assignments. If the Work Journal did not assign a DEF number to an item
+      discovered during doc-sync, use the next available number after the Work
+      Journal's highest assigned number.
+    - Items marked RESOLVED in the Work Journal must NOT appear as open DEF
+      entries in CLAUDE.md or any other document.
 
     ## Close-Out
     After all documentation updates are complete, follow the close-out skill

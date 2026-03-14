@@ -20,6 +20,14 @@ For each item on the Doc Update Checklist:
 4. Mark the item as done
 
 ### Step 2: Decision Log Sync
+**Work Journal Reconciliation (if Work Journal Close-Out provided):**
+Before scanning close-outs for new entries, read the Work Journal Close-Out.
+- Use its DEF number assignments as canonical — do not re-assign.
+- Items marked RESOLVED must not become new DEF entries.
+- Items marked OPEN should be created with the DEF number the Work Journal assigned.
+- For items discovered during doc-sync that the Work Journal did NOT track,
+  assign the next available number AFTER the Work Journal's highest number.
+
 Scan all close-out reports and review reports for:
 - **Judgment calls** that should become DEC entries (any decision that affects future sessions)
 - **New risks** identified that should become RSK entries
@@ -39,6 +47,11 @@ Verify:
       reflecting the change
 - [ ] Architecture document reflects any structural changes made in this sprint
 - [ ] Project status/roadmap reflects sprint completion
+- [ ] All DEF numbers assigned by the Work Journal match the doc-sync output
+- [ ] No DEF numbers were double-assigned (Work Journal vs. doc-sync session)
+- [ ] Resolved items from the Work Journal are NOT created as new DEF entries
+- [ ] DEC entry values (weights, thresholds, etc.) match actual production
+      config files — read the relevant YAML/config files to verify
 
 ### Step 4: Tier A Compression Check
 Evaluate the Claude-optimized documents (Tier A — project knowledge, .claude/rules/):
@@ -88,6 +101,14 @@ following the project's existing rule format.
 ### Integrity Issues Found
 [Any cross-reference problems, numbering gaps, or stale references found and fixed,
 or "None — all references intact"]
+
+### Work Journal Reconciliation
+[If Work Journal Close-Out was provided:
+ - DEF assignments matched: [Y/N, details]
+ - Resolved items excluded: [Y/N, details]
+ - New items beyond Work Journal: [list with assigned DEF numbers]
+ Or "Work Journal Close-Out not provided — DEF assignments are doc-sync
+ session's best effort and should be verified by the developer."]
 
 ---END-DOC-SYNC---
 ```
