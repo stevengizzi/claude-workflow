@@ -1,10 +1,21 @@
-<!-- workflow-version: 1.0.0 -->
+<!-- workflow-version: 1.1.0 -->
 <!-- last-updated: 2026-03-14 -->
 # Template: Work Journal Close-Out
 
-> Produced by the Work Journal conversation at the end of each sprint.
-> Pasted into the doc-sync automation prompt so the doc-sync session has
-> full visibility into DEF/DEC assignments, resolved items, and corrections.
+> **Autonomous runner mode:** The Work Journal (or its equivalent logs) produces
+> a close-out following this template. The runner programmatically populates the
+> doc-sync prompt from this structured data.
+>
+> **Human-in-the-loop mode:** The Work Journal should produce a **filled-in
+> doc-sync prompt** (from `templates/doc-sync-automation-prompt.md`) with this
+> close-out data embedded directly — skipping this intermediate artifact. This
+> template still defines the *content* the Work Journal must track; the delivery
+> format changes from standalone block to embedded section within the doc-sync
+> prompt.
+>
+> In both modes, the close-out data prevents the #1 doc-sync failure mode: DEF
+> number collisions between the Work Journal's assignments and the doc-sync
+> session's independent assignments.
 
 ---
 

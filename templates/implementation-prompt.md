@@ -1,4 +1,4 @@
-<!-- workflow-version: 1.1.0 -->
+<!-- workflow-version: 1.2.0 -->
 <!-- last-updated: 2026-03-14 -->
 # Template: Implementation Prompt
 
@@ -165,6 +165,45 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     The runner's _run_review() step can be simplified to: verify the review
     file exists at the expected path, then extract the structured verdict from
     it.]
+
+    ## Post-Review Fix Documentation
+    If the @reviewer reports CONCERNS and you fix the findings within this same
+    session, you MUST update the artifact trail so it reflects reality:
+
+    1. **Append a "Post-Review Fixes" section to the close-out report file:**
+       Open docs/sprints/sprint-[N]/session-[M]-closeout.md and append:
+
+       ### Post-Review Fixes
+       The following findings from the Tier 2 review were addressed in this session:
+       | Finding | Fix | Commit |
+       |---------|-----|--------|
+       | [description from review] | [what you changed] | [short hash] |
+
+       Commit the updated close-out file.
+
+    2. **Append a "Resolved" annotation to the review report file:**
+       Open docs/sprints/sprint-[N]/session-[M]-review.md and append after
+       the structured verdict:
+
+       ### Post-Review Resolution
+       The following findings were addressed by the implementation session
+       after this review was produced:
+       | Finding | Status |
+       |---------|--------|
+       | [description] | ✅ Fixed in [short hash] |
+
+       Update the structured verdict JSON: change `"verdict": "CONCERNS"` to
+       `"verdict": "CONCERNS_RESOLVED"` and add a `"post_review_fixes"` array.
+       Commit the updated review file.
+
+    If the reviewer reports CLEAR or ESCALATE, skip this section entirely.
+    ESCALATE findings must NOT be fixed without human review.
+
+    [PLANNING NOTE: This ensures the artifact trail is self-consistent. Without
+    this step, someone reading the review report sees "fix this later" for an
+    issue that was already fixed, and the close-out doesn't mention the fix at
+    all. The CONCERNS_RESOLVED verdict lets the runner and doc-sync distinguish
+    "had concerns, all addressed" from "had concerns, still open."]
 
     ## Session-Specific Review Focus (for @reviewer)
     [Numbered list of things to check that are specific to this session --

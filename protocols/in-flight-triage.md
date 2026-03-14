@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-03-12 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-03-14 -->
 # Protocol: In-Flight Triage
 
 **Context:** Claude.ai conversation (Sprint Work Journal)
@@ -115,13 +115,26 @@ during a sprint. The sprint handoff reserves number ranges at the start.
 1. Log the number, brief description, and source session
 2. The doc-sync session creates the full DEC entry from session close-outs
 
-**At sprint close, the Work Journal must produce a close-out block** following
-the `templates/work-journal-closeout.md` template. This block is pasted into
-the doc-sync prompt so the doc-sync session has full visibility.
+**At sprint close, the Work Journal produces the doc-sync deliverable.** The
+format depends on the execution mode:
 
-The Work Journal close-out prevents the #1 doc-sync failure mode: DEF number
-collisions between the Work Journal's assignments and the doc-sync session's
-independent assignments.
+**Human-in-the-loop mode:** The Work Journal produces a **filled-in doc-sync
+prompt** (based on `templates/doc-sync-automation-prompt.md`) with the Work
+Journal close-out data embedded directly. This is a single artifact the
+developer can paste into Claude Code — no intermediate step required. The Work
+Journal has all the information needed to populate every field: sprint summary,
+session list, test deltas, resolved DEFs, deferred items, scope changes, DEC
+entries, and the close-out itself.
+
+**Autonomous runner mode:** The Work Journal (or its equivalent `issues.jsonl` +
+`work-journal.md`) produces a **structured close-out block** following the
+`templates/work-journal-closeout.md` template. The runner programmatically
+populates the doc-sync prompt template from this structured data plus its own
+accumulated logs.
+
+In both modes, the Work Journal close-out data prevents the #1 doc-sync failure
+mode: DEF number collisions between the Work Journal's assignments and the
+doc-sync session's independent assignments.
 
 --
 
