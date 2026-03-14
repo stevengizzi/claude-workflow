@@ -218,10 +218,12 @@ With finalized spec-level artifacts in hand, generate prompts:
    - The Sprint-Level Regression Checklist (embedded)
 
    This file is written once and referenced by all session review prompts.
-   It should be saved with a clear name (e.g., `review-context.md`).
+   Save as `review-context.md` in the sprint directory (see File Layout below).
 
 2. For each session:
    a. **Implementation Prompt** (using templates/implementation-prompt.md).
+      **File name:** `sprint-{N}-{session_id}-impl.md` in the sprint directory.
+      The runner expects this exact naming convention (see File Layout section).
       The Sprint-Level Regression Checklist and Escalation Criteria should
       be embedded directly in each implementation prompt (the implementer
       does not have the review context file).
@@ -240,7 +242,8 @@ With finalized spec-level artifacts in hand, generate prompts:
       This reduces full suite runs from 3× per session to ~4 total per sprint.
 
    b. **Tier 2 Review Prompt** (using templates/review-prompt.md) -- a
-      **small, session-specific file** that:
+      **small, session-specific file** named `sprint-{N}-{session_id}-review.md`
+      in the sprint directory (matching the runner's expected convention) that:
       - Points Claude Code to the Review Context File by path
         (e.g., "Read `sprint-22/review-context.md` for the Sprint Spec,
         Spec by Contradiction, regression checklist, and escalation criteria.")
@@ -347,6 +350,8 @@ Before ending the conversation, verify:
 - [ ] If autonomous mode planned: runner config has been reviewed
 - [ ] If autonomous mode planned: session order in runner config matches
       session breakdown dependency chain
+- [ ] All prompt files follow runner naming convention: `sprint-{N}-{session_id}-impl.md`
+      and `sprint-{N}-{session_id}-review.md` in the sprint directory root (no subdirectories)
 
 ---
 
@@ -371,3 +376,39 @@ A complete sprint package contains:
 12. Tier 2 Review Prompts (one per session, references Review Context File)
 13. Work Journal Handoff Prompt (for in-flight triage conversation)
 14. Runner Configuration (runner-config.yaml, if autonomous mode planned)
+
+---
+
+## Sprint Package File Layout
+
+All sprint package files live in a single flat directory. The runner constructs
+prompt file paths from the sprint directory name and session IDs in
+`session_order` — subdirectories (e.g., `prompts/`) are NOT supported.
+
+**Directory:** `docs/sprints/sprint-{N}/`
+
+**Naming convention:**
+
+| File | Name Pattern | Example |
+|------|-------------|---------|
+| Design Summary | `design-summary.md` | `design-summary.md` |
+| Sprint Spec | `sprint-spec.md` | `sprint-spec.md` |
+| Spec by Contradiction | `spec-by-contradiction.md` | `spec-by-contradiction.md` |
+| Session Breakdown | `session-breakdown.md` | `session-breakdown.md` |
+| Escalation Criteria | `escalation-criteria.md` | `escalation-criteria.md` |
+| Regression Checklist | `regression-checklist.md` | `regression-checklist.md` |
+| Doc Update Checklist | `doc-update-checklist.md` | `doc-update-checklist.md` |
+| Review Context | `review-context.md` | `review-context.md` |
+| Runner Config | `runner-config.yaml` | `runner-config.yaml` |
+| Implementation Prompt | `sprint-{N}-{session_id}-impl.md` | `sprint-24.5-session-1-impl.md` |
+| Review Prompt | `sprint-{N}-{session_id}-review.md` | `sprint-24.5-session-1-review.md` |
+| Work Journal Handoff | `work-journal-handoff.md` | `work-journal-handoff.md` |
+
+**Critical:** The runner builds prompt paths as `{sprint_dir}/{sprint_name}-{session_id}-impl.md`
+(see `state.py` line ~301). The `{session_id}` values come from `session_order` in
+`runner-config.yaml`. If the prompt files don't match this pattern exactly, the
+runner will halt with "Prompt file not found."
+
+**Close-out and review reports** (written during execution, not during planning):
+- `session-{M}-closeout.md` — written by the implementation session
+- `session-{M}-review.md` — written by the @reviewer subagent

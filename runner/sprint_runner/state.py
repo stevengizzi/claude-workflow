@@ -298,6 +298,9 @@ class RunState(BaseModel):
                 parallelizable = meta.parallelizable
 
             # Construct prompt file paths
+            # Convention: {sprint_dir}/{sprint_name}-{session_id}-impl.md
+            # Example: docs/sprints/sprint-24.5/sprint-24.5-session-1-impl.md
+            # This must match the naming in protocols/sprint-planning.md File Layout section.
             prompt_file = str(sprint_dir / f"{sprint_name}-{session_id}-impl.md")
             review_prompt_file = str(sprint_dir / f"{sprint_name}-{session_id}-review.md")
 

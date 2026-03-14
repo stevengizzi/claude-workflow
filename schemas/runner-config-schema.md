@@ -25,11 +25,15 @@ sprint:
 
   # Session execution order (list of session IDs matching prompt filenames)
   # If omitted, runner reads session-breakdown.md and infers order
+  # IMPORTANT: Each session_id here maps to prompt files named:
+  #   {sprint_dir}/sprint-{N}-{session_id}-impl.md
+  #   {sprint_dir}/sprint-{N}-{session_id}-review.md
+  # Example: session_id "session-1" in sprint-24.5 → sprint-24.5-session-1-impl.md
   session_order:
-    - "S1a"
-    - "S1b"
-    - "S2a"
-    - "S3a"
+    - "session-1"
+    - "session-2"
+    - "session-3"
+    - "session-4"
 
   # Path to the review context file (shared across all review prompts)
   review_context_file: "docs/sprints/sprint-23/review-context.md"
