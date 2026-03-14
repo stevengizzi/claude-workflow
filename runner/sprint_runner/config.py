@@ -51,7 +51,7 @@ class SessionMetadata(BaseModel):
     title: str = ""
     compaction_score: int = Field(default=5, ge=0, le=10)
     expected_test_delta: int = 0
-    test_command: str = "python -m pytest tests/ -x -q"
+    test_command: str = "python -m pytest tests/ -x -q -n auto"
     parallelizable: bool = False
     parallel_group: str | None = None
     depends_on: list[str] = Field(default_factory=list)

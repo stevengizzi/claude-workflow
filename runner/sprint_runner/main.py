@@ -258,7 +258,7 @@ class SprintRunner:
         if self.state.status == RunStatus.NOT_STARTED:
             print(f"{Colors.DIM}Running initial test baseline...{Colors.RESET}", flush=True)
             test_count, all_pass = run_tests(
-                "python -m pytest tests/ -x -q",
+                "python -m pytest tests/ -x -q -n auto",
                 cwd=self.repo_root,
             )
             if not all_pass:
@@ -678,7 +678,7 @@ class SprintRunner:
         expected_tests = self.state.test_baseline.current
 
         # Run tests
-        actual_tests, all_pass = run_tests("python -m pytest tests/ -x -q", cwd=self.repo_root)
+        actual_tests, all_pass = run_tests("python -m pytest tests/ -x -q -n auto", cwd=self.repo_root)
 
         if not all_pass:
             self._halt("Test suite has failures before session start")
@@ -857,7 +857,7 @@ class SprintRunner:
             LoopResult (RUNNING to continue, HALTED on mismatch).
         """
         actual_tests, actual_all_pass = run_tests(
-            "python -m pytest tests/ -x -q", cwd=self.repo_root
+            "python -m pytest tests/ -x -q -n auto", cwd=self.repo_root
         )
         session_result.tests_after = actual_tests
 
@@ -1940,7 +1940,7 @@ class SprintRunner:
 
         # Validate test baseline within tolerance
         test_count, all_pass = run_tests(
-            "python -m pytest tests/ -x -q", cwd=self.repo_root
+            "python -m pytest tests/ -x -q -n auto", cwd=self.repo_root
         )
         tolerance = self.config.execution.test_count_tolerance
         if abs(test_count - state.test_baseline.current) > tolerance:
