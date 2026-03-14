@@ -1,9 +1,10 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-03-12 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-03-14 -->
 # Template: Implementation Prompt
 
 Fill in all bracketed sections. The structure of this prompt is designed to
-front-load context, constrain scope, and end with the close-out skill invocation.
+front-load context, constrain scope, and end with the close-out skill invocation
+followed by mandatory Tier 2 review via the @reviewer subagent.
 
 ---
 
@@ -109,6 +110,8 @@ front-load context, constrain scope, and end with the close-out skill invocation
     - [ ] Config validation test passing (if applicable)
     - [ ] Visual review items verified (if applicable)
     - [ ] [Any other completion criteria]
+    - [ ] Close-out report written to file
+    - [ ] Tier 2 review completed via @reviewer subagent
 
     ## Regression Checklist (Session-Specific)
     After implementation, verify each of these:
@@ -129,15 +132,47 @@ front-load context, constrain scope, and end with the close-out skill invocation
 
     Do NOT just print the report in the terminal. Create the file, write the
     full report (including the structured JSON appendix) to it, and commit it.
-    The Tier 2 reviewer will read this file by path.
 
-    [OPTIONAL: After close-out, invoke the reviewer subagent:
-    @reviewer -- provide the sprint spec, close-out report, and the regression
-    checklist below.]
+    ## Tier 2 Review (Mandatory — @reviewer Subagent)
+    After the close-out is written to file and committed, invoke the @reviewer
+    subagent to perform the Tier 2 review within this same session.
 
-    ## Sprint-Level Regression Checklist (for Tier 2 reviewer)
+    Provide the @reviewer with:
+    1. The review context file: [path to review-context.md]
+    2. The close-out report path: docs/sprints/sprint-[N]/session-[M]-closeout.md
+    3. The diff range: git diff HEAD~1
+    4. The test command: [exact test command — see DEC-328 note below]
+    5. Files that should NOT have been modified: [list]
+
+    The @reviewer will produce its review report (including a structured JSON
+    verdict fenced with ```json:structured-verdict) and write it to:
+    docs/sprints/sprint-[N]/session-[M]-review.md
+
+    [PLANNING NOTE (DEC-328): For the @reviewer test command:
+      - Non-final sessions: scoped test command targeting affected modules
+      - Final session of sprint: full suite with `-n auto`]
+
+    [PLANNING NOTE: The @reviewer subagent runs in its own context window with
+    read-only tool restrictions (plus the one permitted write: the review report
+    file). It independently examines the codebase state, runs tests, and checks
+    the diff — it does NOT inherit the implementation session's context. This
+    provides the same fresh-context isolation as a separate review session, but
+    within a single CLI invocation.
+
+    For the autonomous runner: both the structured close-out and the structured
+    verdict are written to disk files. The runner extracts them from disk rather
+    than from CLI output, which is more reliable than parsing terminal output.
+    The runner's _run_review() step can be simplified to: verify the review
+    file exists at the expected path, then extract the structured verdict from
+    it.]
+
+    ## Session-Specific Review Focus (for @reviewer)
+    [Numbered list of things to check that are specific to this session --
+    e.g., "Verify proposals persisted to DB, not memory-only" or
+    "Verify WebSocket endpoint is /ws/v1/ai/chat, not SSE"]
+
+    ## Sprint-Level Regression Checklist (for @reviewer)
     [Paste the sprint-level regression checklist here]
 
-    ## Sprint-Level Escalation Criteria (for Tier 2 reviewer)
+    ## Sprint-Level Escalation Criteria (for @reviewer)
     [Paste the sprint-level escalation criteria here]
-    

@@ -1,6 +1,19 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-03-12 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-03-14 -->
 # Template: Tier 2 Review Prompt
+
+> **Primary path:** The @reviewer subagent is invoked at the end of the
+> implementation session (see implementation-prompt.md). This produces
+> the review report within the same CLI invocation.
+>
+> **This template is used when:**
+> - Running in human-in-the-loop mode with separate manual review sessions
+> - The @reviewer subagent invocation fails and a fallback is needed
+> - The runner is in legacy mode (pre-subagent integration)
+>
+> When generating sprint packages, always generate both the implementation
+> prompt (with @reviewer invocation) and this review prompt as a fallback.
+> The runner will use whichever path its configuration specifies.
 
 This is a small, session-specific file. The shared context (Sprint Spec,
 Specification by Contradiction, regression checklist, escalation criteria) lives
@@ -93,4 +106,3 @@ in the Review Context File and is referenced by path -- not duplicated here.
     [Any session-specific context the reviewer needs -- e.g., "This is attempt 2
     at fixing the auth bug, check if diagnostic-first was followed" or "This
     session follows Session 1 which set up the data model"]
-    

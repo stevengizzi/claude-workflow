@@ -35,7 +35,37 @@ conversation type.
 
 ---
 
+## Quick Start (New Users)
+
+**If this is a brand new project and you're not sure how to begin:**
+Start a conversation and say something like "How do I get started?" or
+"Help me set up this project." Claude will read the Getting Started protocol
+and walk you through everything step by step. No prior knowledge of this
+workflow is required.
+
+---
+
 ## Conversation Type → What to Read
+
+### Getting Started (New Project Onboarding)
+Read first:
+- `protocols/getting-started.md`
+
+This protocol guides new users through project setup from scratch. It assumes
+no familiarity with the workflow system and explains concepts as they become
+relevant. It routes to Discovery and Document Seeding when appropriate.
+
+### Document Seeding (Post-Discovery Canon Creation)
+Read first:
+- `protocols/document-seeding.md`
+- `scaffold/docs/` (all template files — for target structure reference)
+
+This protocol creates the canon documents (project-knowledge.md, decision-log.md,
+architecture.md, etc.) from Discovery outputs. Run this between Discovery and
+Sprint 1 planning.
+
+### Discovery (New Project Research)
+- `protocols/discovery.md`
 
 ### Sprint Planning
 Read first:
@@ -63,9 +93,6 @@ Read during artifact generation (Phase C/D):
 - `templates/implementation-prompt.md`
 - `templates/review-prompt.md`
 
-### Discovery (New Project)
-- `protocols/discovery.md`
-
 ### Strategic Check-In
 - `protocols/strategic-check-in.md`
 
@@ -82,12 +109,14 @@ Read during artifact generation (Phase C/D):
 
 | Protocol | Path | Purpose |
 |----------|------|---------|
+| Getting Started | `protocols/getting-started.md` | New user onboarding — first conversation ever |
+| Document Seeding | `protocols/document-seeding.md` | Create canon docs from Discovery outputs |
+| Discovery | `protocols/discovery.md` | New project kickoff research |
 | Sprint Planning | `protocols/sprint-planning.md` | Core planning — produces full sprint package |
 | Adversarial Review | `protocols/adversarial-review.md` | Stress-test sprint specs |
 | Tier 3 Review | `protocols/tier-3-review.md` | Architectural review at phase boundaries |
 | In-Flight Triage | `protocols/in-flight-triage.md` | Mid-sprint issue classification |
 | Impromptu Triage | `protocols/impromptu-triage.md` | Scope and plan unplanned work |
-| Discovery | `protocols/discovery.md` | New project kickoff research |
 | Strategic Check-In | `protocols/strategic-check-in.md` | Periodic direction review |
 | Codebase Health Audit | `protocols/codebase-health-audit.md` | Systematic code quality review |
 | Retrofit Survey | `protocols/retrofit-survey.md` | Bring existing project into workflow |
@@ -142,7 +171,7 @@ Adopt the new version for the next sprint.
 
 These are **project-specific** and belong in each project's own knowledge files:
 
-- Project description and goals
+- Project description and goals (manifesto)
 - Current state (active sprint, test counts, infrastructure)
 - Architecture document
 - Sprint history and decision log references
