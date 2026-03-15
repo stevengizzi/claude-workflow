@@ -803,12 +803,26 @@ class SprintRunner:
                 msg = f"Session {session.session_id} output is {size} bytes — compaction likely"
                 self.warnings.append(msg)
 
-            # Try to extract closeout
+            # Try to extract closeout from terminal output
             try:
                 closeout = self.executor.extract_structured_closeout(result.output)
             except Exception as e:
                 closeout = None
-                self.warnings.append(f"Closeout extraction error: {e}")
+                self.warnings.append(f"Closeout extraction error (output): {e}")
+
+            # Fallback: try reading closeout from committed file on disk
+            if closeout is None:
+                closeout_file = self.sprint_dir / f"{session.session_id}-closeout.md"
+                if closeout_file.exists():
+                    try:
+                        file_content = closeout_file.read_text()
+                        closeout = self.executor.extract_structured_closeout(file_content)
+                        if closeout is not None:
+                            self.warnings.append(
+                                f"Closeout extracted from file fallback: {closeout_file}"
+                            )
+                    except Exception as e:
+                        self.warnings.append(f"Closeout extraction error (file): {e}")
 
             if closeout is not None:
                 self._save_closeout_json(session.session_id, closeout)

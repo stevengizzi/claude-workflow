@@ -155,8 +155,8 @@ def rollback(sha: str, cwd: Path | str | None = None) -> None:
         GitError: If rollback fails.
         GitStateError: If HEAD doesn't match the expected SHA after rollback.
     """
-    # Discard changes to tracked files
-    _run_git_checked("checkout", "--", ".", cwd=cwd)
+    # Hard reset to checkpoint SHA (undoes both commits and working tree changes)
+    _run_git_checked("reset", "--hard", sha, cwd=cwd)
 
     # Remove untracked files and directories
     _run_git_checked("clean", "-fd", cwd=cwd)
