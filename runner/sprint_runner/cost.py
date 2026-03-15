@@ -9,8 +9,8 @@ import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from scripts.sprint_runner.config import CostConfig
-    from scripts.sprint_runner.state import RunState
+    from .config import CostConfig
+    from .state import RunState
 
 logger = logging.getLogger(__name__)
 

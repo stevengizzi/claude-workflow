@@ -14,8 +14,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from scripts.sprint_runner.config import ConformanceConfig
-    from scripts.sprint_runner.executor import ClaudeCodeExecutor
+    from .config import ConformanceConfig
+    from .executor import ClaudeCodeExecutor
 
 logger = logging.getLogger(__name__)
 

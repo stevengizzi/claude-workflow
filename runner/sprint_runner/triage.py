@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from scripts.sprint_runner.config import TriageConfig
-    from scripts.sprint_runner.executor import ClaudeCodeExecutor, StructuredCloseout
-    from scripts.sprint_runner.state import RunState, SessionPlanEntry
+    from .config import TriageConfig
+    from .executor import ClaudeCodeExecutor, StructuredCloseout
+    from .state import RunState, SessionPlanEntry
 
 logger = logging.getLogger(__name__)
 
@@ -434,7 +434,7 @@ class TriageManager:
         Returns:
             List of inserted fix session IDs.
         """
-        from scripts.sprint_runner.state import SessionPlanEntry, SessionPlanStatus
+        from .state import SessionPlanEntry, SessionPlanStatus
 
         if not self.config.auto_insert_fixes:
             return []

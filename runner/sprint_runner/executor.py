@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, TypeVar
 
 if TYPE_CHECKING:
-    from scripts.sprint_runner.config import ExecutionConfig
+    from .config import ExecutionConfig
 
 
 # ---------------------------------------------------------------------------
