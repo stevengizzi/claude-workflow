@@ -989,14 +989,28 @@ class SprintRunner:
         try:
             verdict = self.executor.extract_structured_verdict(result.output)
         except Exception as e:
-            self._halt(f"Failed to extract review verdict: {e}")
-            return None
+            verdict = None
+            self.warnings.append(f"Verdict extraction error (output): {e}")
+
+        # Fallback: try reading verdict from committed file on disk
+        if verdict is None:
+            review_file = self.sprint_dir / f"{session.session_id}-review.md"
+            if review_file.exists():
+                try:
+                    file_content = review_file.read_text()
+                    verdict = self.executor.extract_structured_verdict(file_content)
+                    if verdict is not None:
+                        self.warnings.append(
+                            f"Verdict extracted from file fallback: {review_file}"
+                        )
+                except Exception as e:
+                    self.warnings.append(f"Verdict extraction error (file): {e}")
 
         if verdict is None:
             # Fallback: attempt to extract verdict from prose
             verdict = self._extract_prose_verdict(result.output, session)
             if verdict is None:
-                msg = "Review output missing structured verdict (no JSON block or prose found)"
+                msg = "Review output missing structured verdict (no JSON block, file, or prose found)"
                 self._halt(msg)
                 return None
 
