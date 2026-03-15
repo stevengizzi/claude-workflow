@@ -78,6 +78,7 @@ class SprintConfig(BaseModel):
     directory: str
     session_order: list[str] = Field(default_factory=list)
     review_context_file: str = ""
+    test_command: str = "python -m pytest tests/ -x -q -n auto"
 
     @field_validator("directory")
     @classmethod
