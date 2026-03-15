@@ -863,9 +863,14 @@ class SprintRunner:
     ) -> LoopResult:
         """Independent test verification (DEC-291).
 
+        Runs the full test suite independently and verifies:
+        1. All tests pass (compared against closeout's all_pass claim)
+        2. Test count hasn't dropped below baseline (not compared against
+           closeout count, which may be from a scoped command per DEC-328)
+
         Args:
             closeout: The extracted closeout.
-            session_result: The session result to populate.
+            session_result: The session result object.
 
         Returns:
             LoopResult (RUNNING to continue, HALTED on mismatch).
@@ -876,7 +881,6 @@ class SprintRunner:
         session_result.tests_after = actual_tests
 
         closeout_all_pass = closeout.tests.get("all_pass", True)
-        closeout_after = closeout.tests.get("after", actual_tests)
 
         if actual_all_pass != closeout_all_pass:
             self._halt(
@@ -889,15 +893,20 @@ class SprintRunner:
             )
             return LoopResult(status=RunStatus.HALTED, halt_reason=reason)
 
+        # Compare against runner's own baseline, not closeout count.
+        # Closeout may report scoped test counts (DEC-328) which are always
+        # lower than the full suite. The baseline is the runner's full-suite
+        # count from sprint start.
+        baseline = self.state.test_baseline.current if self.state else 0
         tolerance = self.config.execution.test_count_tolerance
-        if abs(actual_tests - closeout_after) > tolerance:
+        if baseline > 0 and actual_tests < baseline - tolerance:
             self._halt(
-                f"Close-out claims {closeout_after} tests but "
-                f"independent verification found {actual_tests}"
+                f"Test count dropped below baseline: "
+                f"baseline={baseline}, actual={actual_tests}, tolerance={tolerance}"
             )
             return LoopResult(
                 status=RunStatus.HALTED,
-                halt_reason=f"Test count mismatch: claimed {closeout_after}, actual {actual_tests}",
+                halt_reason=f"Test count regression: baseline={baseline}, actual={actual_tests}",
             )
 
         return LoopResult(status=RunStatus.RUNNING)
