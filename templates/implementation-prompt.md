@@ -26,6 +26,10 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
        Note: In autonomous mode, the expected test count is dynamically adjusted
        by the runner based on the previous session's actual results. The count
        above is the planning-time estimate.
+    [IF frontend session AND parallel execution]:
+    N. Kill orphaned test workers from prior sessions:
+       `pkill -f "vitest/dist/workers" 2>/dev/null; echo "Cleaned"`
+       This prevents RAM accumulation from stuck Vitest fork workers.
     3. Verify you are on the correct branch: [branch name]
     4. [Any other pre-conditions]
 
@@ -36,6 +40,21 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
       - ALL close-outs: always full suite with `-n auto`
       The close-out skill handles its own test invocation — the pre-flight
       distinction is the only thing the implementation prompt needs to vary.]
+
+    [PLANNING NOTE: Frontend test hygiene for parallel sessions.
+      When generating implementation prompts for frontend sessions:
+      - If the session creates or modifies test files that import components
+        with WebSocket hooks, EventSource, setInterval, or other persistent
+        connections: the implementation prompt MUST include a requirement to
+        mock those hooks at the module level via `vi.mock()`.
+      - Unmocked persistent-connection hooks in jsdom cause Vitest fork workers
+        to hang indefinitely. With parallel sessions, this compounds — each
+        stuck worker holds ~500MB–1GB of RAM and a CPU thread.
+      - Include this pre-flight step for ANY frontend session:
+        "Kill any orphaned Vitest workers: `pkill -f 'vitest/dist/workers' 2>/dev/null`"
+      - Projects using Vitest MUST have `testTimeout` and `hookTimeout` set
+        in vitest.config.ts (recommended: 10_000ms). Without these, a single
+        unmocked hook can freeze a worker process permanently.]
 
     ## Objective
     [1-2 sentences: what this session accomplishes]

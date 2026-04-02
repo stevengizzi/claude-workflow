@@ -120,6 +120,16 @@ During Phase A, work through:
       - The session is NOT already at compaction risk 14+
       Justify the flag in the session breakdown.
 
+   e. **Resource impact assessment** (when parallelizable is true and sessions
+      include frontend test runs): Confirm the project's test runner has global
+      timeouts configured (e.g., Vitest `testTimeout`, Jest `testTimeout`).
+      Without timeouts, a single hanging test can spawn a zombie process that
+      persists after the session ends. With N parallel sessions, this compounds
+      to N stuck processes × ~500MB–1GB each.
+
+      For parallel frontend sessions, add to each implementation prompt's
+      pre-flight: "Kill orphaned test workers before starting."
+
    c. Confirm the implementation prompt template includes the structured
       close-out requirement (referencing the close-out skill's structured
       appendix section).
@@ -352,6 +362,8 @@ Before ending the conversation, verify:
       session breakdown dependency chain
 - [ ] All prompt files follow runner naming convention: `sprint-{N}-{session_id}-impl.md`
       and `sprint-{N}-{session_id}-review.md` in the sprint directory root (no subdirectories)
+- [ ] If frontend sessions run Vitest: project has `testTimeout` and `hookTimeout`
+      configured (prevents orphaned worker processes from hanging indefinitely)
 
 ---
 
