@@ -107,6 +107,8 @@ RULE-035: If the implementation prompt references an API, service, or library yo
 
 RULE-036: When performance is relevant (data processing, API calls, rendering), include performance benchmarks in your verification. "It works" is insufficient if it takes 100x longer than acceptable. (ARGUS Sprint 8: VectorBT implementation used iterrows() and took 4+ hours; the spec had not included performance gates.)
 
+RULE-037: Before relaunching any long-running background command that appears stuck or produces incomplete output, verify the original process is no longer running. Use `pgrep -fl <command>` to check; use `pkill -f <command> && sleep 2` to clean up. Never accumulate duplicate background processes — doing so degrades system performance, produces overlapping partial output, and can corrupt timing-sensitive tests. The correct sequence is always: kill → diagnose → fix → relaunch. (ARGUS Sprint 32.9: repeated pytest relaunches on a hanging async test accumulated 4 concurrent processes, degrading the subsequent full-suite run from ~49s to ~178s.)
+
 ---
 
 ## Meta
