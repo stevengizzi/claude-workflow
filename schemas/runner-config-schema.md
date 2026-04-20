@@ -120,11 +120,10 @@ notifications:
   # WARNING notifications. HALTED and COMPLETED always send regardless.
   quiet_hours:
     enabled: true
-    # Steven is in Taipei (UTC+8). 11 PM - 7 AM local = 3 PM - 11 PM UTC
-    # But US market hours (9:30 PM - 5 AM local) are active trading time.
-    # Set quiet hours to non-market, non-waking local time.
-    start_utc: "07:00"  # 3 PM Taipei — after market close, afternoon nap ok
-    end_utc: "13:00"    # 9 PM Taipei — before US pre-market starts
+    # Operator is on US East Coast (ET). Quiet hours = overnight.
+    # US market hours (9:30 AM - 4:00 PM ET) are active trading time.
+    start_utc: "05:00"  # 1 AM ET — well after market close
+    end_utc: "13:00"    # 9 AM ET — before US pre-market ramp-up
 
   # Re-notify if HALTED goes unacknowledged for this many minutes
   halted_reminder_minutes: 60
