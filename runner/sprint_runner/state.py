@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from .config import RunnerConfig
 
@@ -113,6 +113,11 @@ class SessionPlanEntry(BaseModel):
 
 class SessionResult(BaseModel):
     """Results from a completed session."""
+
+    # validate_assignment coerces raw strings (e.g. from parsed verdict
+    # payloads) into their enum variant on assignment, which avoids the
+    # PydanticSerializationUnexpectedValue warning at model_dump_json time.
+    model_config = ConfigDict(validate_assignment=True)
 
     implementation_verdict: ImplementationVerdict | None = None
     review_verdict: ReviewVerdict | None = None
