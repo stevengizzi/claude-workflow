@@ -111,6 +111,162 @@ RULE-037: Before relaunching any long-running background command that appears st
 
 ---
 
+## 9. Session-Start Verification
+
+RULE-038: At the start of every session, grep-verify every factual claim the prompt makes against the current state of the codebase before acting on it. This applies in at least four variants:
+
+- **File paths.** If the prompt says "edit `src/foo/bar.py:142`," confirm the file exists at that path and the line number still matches. Handoff docs, planning trackers, and kickoff specs routinely drift from source as commits land between authoring and execution.
+- **Grep-observable claims.** If the prompt cites a count (e.g., "9 `@patch` decorators in `test_x.py`", "unused import `Foo`"), re-grep before applying the suggested fix. The observation may no longer hold.
+- **Metric values.** If the prompt cites a measured metric (coverage %, LOC count, warning count, file count, test count), re-measure at session start and treat the re-measurement as authoritative. Audit values are directional flags, not ground truth.
+- **Tracker nicknames vs filenames.** Planning trackers often label sessions by thematic nickname ("frontend, solo") while the actual spec file is named for its scope ("experiments-and-learning-loop"). Before drafting a kickoff or acting on a tracker entry, grep the actual spec filename.
+
+When the re-verification disagrees with the prompt, mark the finding as RESOLVED-VERIFIED (if the fix already appears to be in place) or flag the discrepancy in the close-out — do not invent a fix for a claim that no longer holds.
+
+<!-- Origin: Sprint 31.9 campaign retro — consolidates P6, P12, P13, P19, P22.
+     Evidence: FIX-04/06/07 hit repeated spec-path drift (CSV-garbled line drifts;
+     Finding 17 pointed at position_sizer.py but the real site was
+     quality_engine.py). FIX-13c re-measured AI module coverage and found 3 of 4
+     modules worse than the audit claimed (prompts 56% vs 63%). The audit-count
+     pattern also hit F22/F24 in FIX-13a where "9 @patch decorators" and "unused
+     AfternoonMomentumStrategy import" had both gone stale between audit and
+     session. Stage 6 was tracker-nicknamed "frontend, solo" but FIX-08's actual
+     scope was backend-only. -->
+
+RULE-039: When the prompt describes a risky batch edit (large file refactor, multi-site rename, cross-file move), stage the work as: (1) read-only exploration, (2) structured findings report with the concrete change list, (3) halt, (4) operator confirms the list, (5) edit. The in-session report + halt is the mechanism that makes the final edit pass surgical. Skipping the report step collapses risky edits into guess-and-check and has caught out multiple sessions.
+
+<!-- Origin: Sprint 31.9 retro, P5. Codifies the "scoping-before-fix" variant
+     that emerged from impromptu-triage work on 2026-04-21, and matches how
+     the pre-edit verification step in the RETRO-FOLD campaign's Prompt 1
+     chore caught 3 errors before any edit ran. -->
+
+---
+
+## 10. Empirical Evidence Discipline
+
+RULE-040: Small-sample sweep conclusions are directional only. Benchmarks, A/B comparisons, performance measurements, or optimization sweeps run over small samples (few symbols, few seeds, few runs, few trials) point at which direction the needle moves — they do not establish production-ready decisions. Before promoting any "winner" from a small sample, either (a) run the full-scale confirmation sweep, or (b) document explicitly that the decision is provisional and name the validation sprint that will resolve it.
+
+<!-- Origin: Sprint 31.9 retro, P7. Concrete example: ARGUS's 24-symbol
+     momentum sweep in April 2026 found 2 qualifying variants, but operators
+     interpreting the sweep could have over-read those specific symbols as
+     universal. The same anti-pattern shows up in coverage sweeps, micro-
+     benchmarks, and any "we ran it twice and picked the faster one" flow. -->
+
+---
+
+## 11. Flake Discipline
+
+RULE-041: Any new CI flake must be assigned a DEF (or equivalent deferred-item) number immediately upon first observation, with at minimum: the symptom, the test name, the observed environment (xdist worker, OS, CI run URL), and a reproduction hint. Do not mark a flaky test as "transient" or "unrelated" without a DEF entry. Once the DEF catalog is complete, zero-tolerance on flakes becomes enforceable — any red CI run is a real bug until proven otherwise. Without catalog completeness, real regressions hide inside the "known flake" category.
+
+<!-- Origin: Sprint 31.9 retro, P8. Earned during the campaign's push to
+     first-green-CI milestone at commit 793d4fd on 2026-04-22: the cleanup
+     only held because every remaining intermittent failure had a DEF number
+     with a per-item mitigation (DEF-150/167/171/190/192). -->
+
+---
+
+## 12. Anti-Patterns in Code
+
+RULE-042: `getattr(obj, "field", default)` on a value of known type is a silent-default anti-pattern. The default hides bugs when the attribute name is wrong or the caller is passing a different type than expected — the lookup succeeds against the fallback and the caller sees a benign value (often 0 or None) instead of an exception. Prefer `obj.field` when the type is known; narrow the type (`isinstance` guard) before attribute access when the type is ambiguous. This applies equally to `dict.get(key, default)` when the key is load-bearing (a missing key should raise, not silently evaluate to the default).
+
+<!-- Origin: Sprint 31.9 retro, P9. Concrete example: ARGUS DEF-139/140
+     ("startup zombie flatten queue") was caused by four Order Manager call
+     sites that read `getattr(pos, "qty", 0)` on a Position object; Position
+     uses the field name `shares`, so every call silently returned 0 and the
+     flatten reported "positions closed" while the broker retained them.
+     DEF-199's root cause included the same family — and the grep-audit that
+     FIX-04 ran found the pattern in multiple additional sites. -->
+
+RULE-043: `except Exception:` blocks in test code can silently swallow `pytest.fail()`, `assert` failures, and other test-framework signals — turning a regression guard into a tautology. When writing or reviewing tests, narrow each catch to the specific expected exception type. When modifying existing tests that use broad catches, verify that no `pytest.fail(...)`, `assert`, or raise-on-condition was relying on propagation.
+
+<!-- Origin: Sprint 31.9 retro, P17. Concrete example: F19 in FIX-13a found
+     `tests/api/test_observatory_ws.py` had been passing since Sprint 25 not
+     because the route-disabled behavior was correct, but because the broad
+     `except Exception: pass` around the assertions had been quietly
+     discarding the explicit `pytest.fail()` call for roughly six months. -->
+
+---
+
+## 13. Test Discipline
+
+RULE-044: When closing a DEF on a test whose failure mode is time-of-day-bounded, timezone-dependent, or otherwise windowed, the closure requires evidence from inside the failing window — or an explicit argument for why the window no longer exists. A single green run from outside the window is not sufficient; the Python-side fix may not exercise the SQL-side comparator, or the CI runner's UTC clock may be outside the ET/local divergence window that triggered the flake.
+
+<!-- Origin: Sprint 31.9 retro, P14. Concrete example: DEF-163's FIX-05
+     strikethrough was premature — the Python-side fix didn't exercise the
+     SQL-side `date()` comparator, and the test's failure mode was a ~4h
+     daily window. IMPROMPTU-03 reopened it and added in-window CI
+     regression evidence. -->
+
+RULE-045: Timezone-sensitive tests must derive "today" / "now" the same way the implementation does. If the implementation uses `datetime.now(tz=_ET).date()`, the test must compare against an ET-derived date — never `datetime.date.today()` (local tz) or `datetime.now(UTC).date()`. Three further sub-rules prevent the recurring ET-vs-UTC flake family:
+
+- Avoid `datetime.now(...)` for synthetic test fixture timestamps. Use fixed wall-clock anchors (e.g., 15:00 ET) so the test is deterministic across runners.
+- If a test must mock "now," mock it explicitly (e.g., `freeze_time`, `patch('module.datetime')`) rather than letting wall-clock variation drive the assertion.
+- On UTC-only CI runners (GitHub Actions Linux), audit any `datetime.now()` / `date.today()` call in a test for implicit local-tz assumptions.
+
+<!-- Origin: Sprint 31.9 retro, P15. Evidence: DEF-163, DEF-188, and DEF-190's
+     neighbors all shared the shape — implementation correctly used ET, test
+     compared against local-tz or UTC. -->
+
+RULE-046: Do not give non-test classes a `Test*` prefix in a pytest project. Pytest will attempt to collect the class as a test; if the class has an `__init__`, collection will warn (`PytestCollectionWarning: cannot collect test class 'X' because it has a __init__ constructor`). If rename is impossible due to API stability, add `__test__ = False` as a class attribute so pytest skips collection silently.
+
+<!-- Origin: Sprint 31.9 retro, P16. Concrete example: a `TestBaseline`
+     Pydantic model in ARGUS's sprint_runner triggered this warning until
+     the class attribute was added. -->
+
+RULE-047: Test-only sessions that exercise optional runtime dependencies must mock those dependencies at the `sys.modules` level rather than relying on local environment availability. If the test triggers a lazy `from foo import Bar` that the local dev environment supplies (pip-installed during unrelated work), the test will pass locally but fail in CI where the optional package is not in any dependency group. Use `monkeypatch.setitem(sys.modules, "foo", fake_or_None)` — setting `None` is the canonical way to force the ImportError branch in the code under test.
+
+<!-- Origin: Sprint 31.9 retro, P24. Concrete example: FIX-13c's
+     `test_get_client_caches_instance` exercised a lazy `from anthropic import
+     AsyncAnthropic`. Locally the test passed because pre-draft coverage
+     measurement had pip-installed anthropic; on CI (where anthropic is a
+     pure runtime optional, not in any `[project.dependencies]` group) the
+     import raised and the test failed. Cross-reference the sibling test
+     `test_get_client_raises_importerror_when_anthropic_missing`, which uses
+     this pattern correctly. -->
+
+RULE-048: Before relying on a library-behavior side-effect suggested by a kickoff ("just import X and the extension registers"), verify by observation that the side-effect actually fires. Library registration is frequently lazy and runs on first real use, not at import. Trace the behavior under `python -X tracemalloc`, inspect the library source, or add a test that captures the registered state, before accepting a bare-import fix.
+
+<!-- Origin: Sprint 31.9 retro, P18. Concrete example: FIX-13a's DEF-190
+     kickoff said "conftest.py-level eager pyarrow import." But `import
+     pyarrow` does NOT trigger `register_extension_type` — pyarrow's
+     extension registration is lazy and runs on first DataFrame→Arrow
+     conversion. The fix had to be strengthened to a forcing function:
+     `pd.DataFrame({period_col}) → pa.Table.from_pandas(df)`. -->
+
+---
+
+## 14. Repath + Mechanical Migration Hazards
+
+RULE-049: When a kickoff proposes a `git mv` that changes the directory depth of test files, pre-grep for `parents[N]` path-literal call sites in the moved files and enumerate the expected fix-count in the kickoff. Depth changes silently break `Path(__file__).parents[N] / "fixtures"` idioms, and the breakage only surfaces when the affected tests run. The pre-grep gives the session a check against its own work: if the kickoff says "expect 4 sites to fix," a session that finds only 3 knows to keep looking.
+
+Grep pattern: `grep -rn 'parents\[[0-9]\]' {files-being-moved}`.
+
+<!-- Origin: Sprint 31.9 retro, P21. Concrete example: FIX-13b's F11
+     reparented integration test files into a deeper subpackage; 4 path-
+     literal sites had to be updated (1 in test_core.py, 3 in
+     test_sprint329.py). The kickoff flagged the hazard generically but
+     didn't specify a count, so there was no signal if a site was missed. -->
+
+---
+
+## 15. CI Verification Discipline
+
+RULE-050: A session is not complete until CI verifies green on the session's final commit (or the barrier commit, for bundled sessions). Each session's close-out MUST cite a green CI run link, and the Tier 2 reviewer MUST verify CI status as part of the checklist — not merely local pytest. Without this, a red CI state can persist invisibly across multiple sessions because newer pushes cancel older in-flight runs on most CI providers.
+
+Operationally this implies:
+- Do not push commits faster than CI can complete a run (typical: ~4 minutes). If a push must go out before the previous CI run finishes, explicitly wait for green before starting the next session.
+- A `pytest-timeout` (or equivalent per-test timeout) partially defends this class of regression by converting hangs into per-test failures with tracebacks. It does NOT catch non-hang regressions that complete within the timeout budget.
+- If the test baseline changed between two sessions and no one saw a green CI run in between, treat the intervening state as unknown and run a dedicated verification CI.
+
+<!-- Origin: Sprint 31.9 retro, P25. Evidence: six commits accumulated
+     between FIX-13a (c9c8891) and FIX-13c hotfix (ffcfb5c) without anyone
+     confirming CI passed. Each push cancelled its predecessor; the FIX-13a
+     test-timeout regression stayed hidden across FIX-13b (7 commits), Stage
+     8 Wave 2 barrier, FIX-13c (3 commits), and Stage 8 Wave 3 barrier —
+     unmasked only when the FIX-13c anthropic ImportError happened to fail
+     fast enough to produce visible output. -->
+
+---
+
 ## Meta
 
 This file is maintained in the metarepo and seeded into every project during bootstrap.

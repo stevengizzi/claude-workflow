@@ -30,6 +30,14 @@ language hint) so the user can copy/paste it with table formatting preserved.
 |------|-------------|-----------|
 | [path] | [added/modified/deleted] | [why] |
 
+<!-- The Change Manifest must include sprint operational files edited during the
+     session (e.g., RUNNING-REGISTER.md, CAMPAIGN tracker, DEF register). A
+     file that was edited but not listed is an incomplete manifest, even if
+     the edit was "just bookkeeping."
+     Origin: Sprint 31.9 retro, P11 — Tier 2 flagged RUNNING-REGISTER.md
+     omissions from FIX-05's manifest. -->
+
+
 ### Judgment Calls
 Decisions made during implementation that were NOT specified in the prompt:
 - [decision]: [rationale]
@@ -53,6 +61,14 @@ Run each item from the session's regression checklist:
 - Tests failed: [count]
 - New tests added: [count]
 - Command used: [exact test command]
+
+<!-- The "after - before" delta MUST equal "New tests added" exactly. If it
+     doesn't, flag it explicitly: either pre-existing tests disappeared
+     (regression hiding inside the delta), or new tests were counted twice.
+     Never let a gain in new tests silently offset a loss in pre-existing
+     tests — that pattern is how silent test regressions land.
+     Origin: Sprint 31.9 retro, P10. -->
+
 
 ### Unfinished Work
 Items from the spec that were not completed, and why:
@@ -80,11 +96,35 @@ Rate your session using these criteria:
 
 ### Step 3: Commit
 After generating the close-out report:
-1. Stage all changes: `git add -A`
-2. Commit with message: `[Sprint X.Y] [session scope summary]`
-3. Push to remote: `git push`
+
+1. Stage changes (prefer explicit paths over `git add -A` to avoid accidentally
+   committing untracked files outside session scope).
+2. **Pre-commit scope check.** Run `git diff --name-only --cached` and confirm
+   every staged path is within the session's declared scope (the Change Manifest).
+   If a staged file is not in the manifest — either add it to the manifest (and
+   justify why it was touched) or unstage it. Do not commit a mixed-scope diff.
+   <!-- Origin: Sprint 31.9 retro, P4. A scope-mixing commit (c3bc758 "chimera
+        Pass 3") bundled unrelated changes across sessions. The pre-commit
+        grep is the cheapest gate against that class of bug. -->
+3. Commit with message: `[Sprint X.Y] [session scope summary]`
+4. Push to remote: `git push`
 
 Do NOT push if self-assessment is FLAGGED — wait for developer review of the close-out.
+
+### Step 4: CI Verification
+After pushing, wait for CI to complete on the session's final commit and record
+the green CI run URL in the close-out report. If CI fails, do not start the
+next session until a fix has landed and the re-run is green. If a subsequent
+push arrives before CI completes on the prior commit, most CI providers cancel
+the prior run — so the intervening state becomes unverified.
+
+Record in the close-out:
+- CI run URL: [link to the run covering this session's final commit]
+- CI status: [GREEN / RED / CANCELLED-BY-NEXT-PUSH]
+
+<!-- Origin: Sprint 31.9 retro, P25. See also RULE-050 in
+     claude/rules/universal.md. -->
+
 
 ## Structured Close-Out Appendix
 

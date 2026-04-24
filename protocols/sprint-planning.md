@@ -101,6 +101,29 @@ During Phase A, work through:
    integration tests accumulate. This prevents the chronic underestimation seen
    in Sprint 22 (85 estimated vs. 288 actual).
 
+   **Parametrized tests count per case, not per decorator.** When the kickoff
+   recommends a parametrized pattern (`@pytest.mark.parametrize`), the estimate
+   should multiply the single-test estimate by the number of parameter cases.
+   Similarly, exhaustive error-path tests (N orthogonal error types × M
+   triggering conditions each) should be enumerated rather than treated as
+   "a few tests for error paths."
+   <!-- Origin: Sprint 31.9 retro, P23. FIX-13c estimated +25 to +35 pytest;
+        actual was +52, primarily because the recommended parametrized page-
+        formatter test was counted as 1 but pytest reported 5 (one per tuple),
+        and the exhaustive error-path tests for `_build_system_state` totalled
+        10 (orchestrator × 2 + broker × 3 + equity × 2 + circuit × 3). -->
+
+   **Measure runtime claims; don't infer them.** When a kickoff cites a runtime
+   cost ("N × 30s = 180s"), measure actual durations via `pytest --durations=10`
+   against the baseline HEAD during pre-draft investigation, and cite the
+   measured numbers. Config defaults and theoretical ceilings drift as earlier
+   fixes reduce individual test costs — FIX-13b's kickoff claimed 6 × 30s
+   flatten tests, but 4 of 6 had already been reduced to ~1s by FIX-04's
+   shared `config` fixture override. Uniform refactors may still be correct
+   for consistency, but the runtime-savings pitch needs current numbers.
+   <!-- Origin: Sprint 31.9 retro, P20. -->
+
+
    **Frontend visual-review fix budget:** For frontend sessions that include
    visual review items, budget an additional 0.5-session fix allowance in the
    session breakdown. If the visual review discovers no issues, the slot is
@@ -364,6 +387,13 @@ Before ending the conversation, verify:
       and `sprint-{N}-{session_id}-review.md` in the sprint directory root (no subdirectories)
 - [ ] If frontend sessions run Vitest: project has `testTimeout` and `hookTimeout`
       configured (prevents orphaned worker processes from hanging indefinitely)
+- [ ] Tracker nicknames reconcile with actual spec filenames. If the session
+      list in the tracker uses thematic shorthand ("frontend, solo"), verify
+      the generated spec filename describes the real scope. A tracker label
+      that drifts from the spec produces kickoffs that trust the wrong
+      context at session start.
+      <!-- Origin: Sprint 31.9 retro, P13. Stage 6 was tracker-nicknamed
+           "frontend, solo" but FIX-08's actual spec was backend-only. -->
 
 ---
 

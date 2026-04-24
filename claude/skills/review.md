@@ -19,6 +19,15 @@ Before starting, you need:
 3. Run `git diff HEAD~1` (or the appropriate range) to see all changes
 4. Run the full test suite
 5. Read the sprint-level regression checklist
+6. **Verify CI status.** Confirm CI is green on the session's final commit.
+   Use `gh run list --branch <branch> --limit 5` (or the project's equivalent).
+   If CI is red, in-flight, or was cancelled by a newer push, the review
+   verdict MUST reflect that — a local green pytest is not sufficient
+   because CI may exercise an environment the local run does not (fresh
+   venv, UTC timezone, `-n auto` xdist, different Python minor). This is a
+   hard check, not advisory.
+   <!-- Origin: Sprint 31.9 retro, P25. See RULE-050. -->
+
 
 ### Step 2: Evaluate
 For each of the following, assess PASS or FAIL:
@@ -46,6 +55,24 @@ For each of the following, assess PASS or FAIL:
 - Do changes respect the project's architectural constraints?
 - Are interfaces, naming conventions, and patterns consistent with the codebase?
 - Is new technical debt introduced? If so, is it tracked?
+- **Test-vs-production import drift (for library-migration sessions).** When
+  the session swaps one library for another (e.g., `jose` → `jwt`, `alpaca-py`
+  → `ib_insync`), grep-audit test files for the old import. Tests often keep
+  working on the old import via a lingering transitive install, hiding the
+  fact that production migrated but tests didn't. Fail the check if any test
+  file still imports the retired library after the session.
+  <!-- Origin: Sprint 31.9 retro, P3. Concrete example: FIX-18 had a gap
+       where test imports trailed the production jwt migration. -->
+
+**Dependency-Change Sessions (if applicable)**
+- If the session modified `requirements*.lock`, `pyproject.toml`,
+  `package.json`, or equivalent, verify a fresh-venv install succeeds from
+  the lockfile alone. Many dep regressions surface only on a clean install
+  (wheel missing for a pinned version, transitive dep conflict, etc.) and
+  are invisible to a local re-run that reuses the dev venv.
+  <!-- Origin: Sprint 31.9 retro, P1. Evidence: xdist and seaborn install
+       issues were missed locally because the dev venv had both packages
+       pre-cached from unrelated work. -->
 
 **Escalation Criteria Check**
 - Evaluate every item on the sprint-level escalation criteria list

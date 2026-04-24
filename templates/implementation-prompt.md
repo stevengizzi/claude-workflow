@@ -100,6 +100,42 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     |----------|-------------|
     | [yaml_key] | [model_field] |
 
+    ## Marker Validation (if this session adds pytest markers)
+    [Include this section when the session adds a new pytest marker — to
+    `pyproject.toml`, `pytest.ini`, or equivalent. Omit entirely for sessions
+    that do not add markers.]
+
+    After adding the marker(s), verify each new marker collects non-zero
+    tests:
+
+        python -m pytest -m "[new_marker]" --collect-only -q
+
+    A marker that collects zero tests is a dead marker — the CI tiering or
+    filtering logic that depends on it will silently skip no work. Record
+    the collect-only count in the close-out.
+
+    <!-- PLANNING NOTE: Origin: Sprint 31.9 retro, P2. FIX-18 added markers
+         but initially no tests carried the marker; the marker-tiering was a
+         no-op until the follow-on session wired tests to it. -->
+
+    ## Risky Batch Edit — Staged Flow (if applicable)
+    [Include this section for sessions whose scope involves large-file
+    refactors, multi-site renames, or cross-file moves. Omit for single-file
+    or small-scope edits.]
+
+    Execute the session in five explicit phases and halt between phase 3 and 4:
+    1. Read-only exploration of the affected surface. No edits.
+    2. Produce a structured findings report: exact file list, exact site list
+       (file:line), the planned edit per site, and any sites that look eligible
+       but should be skipped with reasoning.
+    3. Write the report to a file in the session directory.
+    4. **Halt.** Surface the report to the operator and wait for confirmation.
+    5. Apply edits exactly as listed in the confirmed report.
+
+    See RULE-039 in `.claude/rules/universal.md`.
+    <!-- PLANNING NOTE: Origin: Sprint 31.9 retro, P5. -->
+
+
     ## Visual Review (if applicable)
     [Include this section for any session that modifies UI. Omit entirely for
     backend-only sessions. This tells the developer exactly what to check in
