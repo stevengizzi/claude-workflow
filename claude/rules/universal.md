@@ -174,7 +174,12 @@ RULE-042: `getattr(obj, "field", default)` on a value of known type is a silent-
      uses the field name `shares`, so every call silently returned 0 and the
      flatten reported "positions closed" while the broker retained them.
      DEF-199's root cause included the same family — and the grep-audit that
-     FIX-04 ran found the pattern in multiple additional sites. -->
+     FIX-04 ran found the pattern in multiple additional sites. Note: the
+     `dict.get(key, default)` extension in the rule body is a same-shape
+     generalization (both idioms return a benign default on lookup failure),
+     hedged by "when the key is load-bearing." The dict.get case has no
+     direct campaign origin evidence — ground it with concrete evidence when
+     a future sprint surfaces a `dict.get`-default bug of the same class. -->
 
 RULE-043: `except Exception:` blocks in test code can silently swallow `pytest.fail()`, `assert` failures, and other test-framework signals — turning a regression guard into a tautology. When writing or reviewing tests, narrow each catch to the specific expected exception type. When modifying existing tests that use broad catches, verify that no `pytest.fail(...)`, `assert`, or raise-on-condition was relying on propagation.
 
@@ -202,9 +207,13 @@ RULE-045: Timezone-sensitive tests must derive "today" / "now" the same way the 
 - If a test must mock "now," mock it explicitly (e.g., `freeze_time`, `patch('module.datetime')`) rather than letting wall-clock variation drive the assertion.
 - On UTC-only CI runners (GitHub Actions Linux), audit any `datetime.now()` / `date.today()` call in a test for implicit local-tz assumptions.
 
-<!-- Origin: Sprint 31.9 retro, P15. Evidence: DEF-163, DEF-188, and DEF-190's
-     neighbors all shared the shape — implementation correctly used ET, test
-     compared against local-tz or UTC. -->
+<!-- Origin: Sprint 31.9 retro, P15. Evidence: DEF-163 (SQLite `date()`
+     UTC-normalization vs `today_et`), DEF-188 (`datetime.now(tz=_ET).date()`
+     vs `datetime.date.today()` on UTC CI runner), and DEF-167 (Vitest
+     hardcoded-date decay) all shared the shape — implementation and test
+     derived "today" from different sources, or fixed wall-clock anchors
+     were used where relative dates drifted. All three were resolved in
+     ARGUS Sprint 31.9 (IMPROMPTU-03 + FIX-13a). -->
 
 RULE-046: Do not give non-test classes a `Test*` prefix in a pytest project. Pytest will attempt to collect the class as a test; if the class has an `__init__`, collection will warn (`PytestCollectionWarning: cannot collect test class 'X' because it has a __init__ constructor`). If rename is impossible due to API stability, add `__test__ = False` as a class attribute so pytest skips collection silently.
 
