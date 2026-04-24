@@ -122,7 +122,7 @@ RULE-038: At the start of every session, grep-verify every factual claim the pro
 
 When the re-verification disagrees with the prompt, mark the finding as RESOLVED-VERIFIED (if the fix already appears to be in place) or flag the discrepancy in the close-out — do not invent a fix for a claim that no longer holds.
 
-<!-- Origin: Sprint 31.9 campaign retro — consolidates P6, P12, P13, P19, P22.
+<!-- Origin: Sprint 31.9 retro, P6 + P12 + P13 + P19 + P22 (consolidated).
      Evidence: FIX-04/06/07 hit repeated spec-path drift (CSV-garbled line drifts;
      Finding 17 pointed at position_sizer.py but the real site was
      quality_engine.py). FIX-13c re-measured AI module coverage and found 3 of 4
