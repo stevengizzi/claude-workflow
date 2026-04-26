@@ -96,6 +96,9 @@ Read during artifact generation (Phase C/D):
 ### Campaign Orchestration / Absorption / Close
 - **Campaign Orchestration / Absorption / Close** — read `protocols/campaign-orchestration.md` for the full protocol covering campaign absorption (§1), supersession (§2), authoritative-record preservation (§3), cross-track close-out (§4), pre-execution gates (§5), naming conventions (§6), DEBUNKED status (§7), absorption-vs-sequential decision matrix (§8), and the two-session SPRINT-CLOSE option (§9). Also read `protocols/sprint-planning.md` for per-session planning within the campaign.
 
+### Operational Debrief / Post-Incident Review / Periodic Review
+- **Operational Debrief / Post-Incident Review / Periodic Review** — read `protocols/operational-debrief.md` for the abstract pattern covering periodic operational debriefs, event-driven debriefs, and periodic-without-cycle reviews. Cross-reference `protocols/campaign-orchestration.md` §1 for absorbing debrief findings into ongoing campaigns. Project-specific debrief protocols (e.g., ARGUS's `docs/protocols/market-session-debrief.md`) instantiate this abstract pattern.
+
 ### Strategic Check-In
 - `protocols/strategic-check-in.md`
 
@@ -121,6 +124,7 @@ Read during artifact generation (Phase C/D):
 | In-Flight Triage | `protocols/in-flight-triage.md` | Mid-sprint issue classification |
 | Impromptu Triage | `protocols/impromptu-triage.md` | Scope and plan unplanned work |
 | Campaign Orchestration | `protocols/campaign-orchestration.md` | Multi-session campaigns with persistent coordination state (5+ sessions, multi-track, accumulating registers) |
+| Operational Debrief | `protocols/operational-debrief.md` | Recurring-event-driven knowledge streams (periodic / event-driven / periodic-without-cycle); execution-anchor-commit correlation pattern |
 | Strategic Check-In | `protocols/strategic-check-in.md` | Periodic direction review |
 | Codebase Health Audit | `protocols/codebase-health-audit.md` | Systematic code quality review |
 | Retrofit Survey | `protocols/retrofit-survey.md` | Bring existing project into workflow |
