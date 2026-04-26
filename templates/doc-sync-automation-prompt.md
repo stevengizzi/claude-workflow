@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-03-12 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-04-26 -->
 # Template: Doc-Sync Automation Prompt
 
 This template is populated by the runner after all sessions complete and
@@ -122,3 +122,75 @@ replaced at runtime.
     - files_modified: list of all documentation files updated
     - Any items from the doc-sync queue that could not be resolved (noted as
       scope_gaps for human review)
+
+---
+
+## Between-Session Doc-Sync (Campaign Mode)
+
+[The standard doc-sync template above covers post-sprint reconciliation. This subsection covers a different cadence: between-session doc-sync within a long-running campaign, where small targeted updates land between successive Claude Code sessions to keep CLAUDE.md and other coordination docs current with the running register.]
+
+A between-session doc-sync prompt is a tiny, targeted operation. Unlike a full doc-sync (which reconciles everything at sprint close), a between-session doc-sync handles a specific small update — typically a DEF closure, a metric update (test count, file count), or a status-line refresh. It uses find/replace patches with explicit pre-state verification and post-state grep checks.
+
+### Structure of a Between-Session Doc-Sync Prompt
+
+```
+# Between-Session Doc-Sync: <description>
+
+## Pre-State Verification
+[Grep commands the implementer runs first to confirm the document is in
+the expected state before the patch lands. If the pre-state doesn't
+match, halt and report.]
+
+```bash
+grep "<expected-string>" <file-path>
+# Expected: <count>
+```
+
+## Patch
+[Exact find/replace pairs. Use ` ```text ` blocks rather than diff syntax;
+the implementer applies them via str_replace tools.]
+
+**File:** `<path>`
+
+**Find:** ...
+**Replace with:** ...
+
+## Post-State Verification
+[Grep commands run after the patch to confirm the new state. Mirror the
+pre-state checks.]
+
+```bash
+grep "<new-string>" <file-path>
+# Expected: <count>
+```
+
+## Commit Message
+[Exact commit message text the implementer should use.]
+
+```
+docs(<scope>): <short description>
+```
+
+## Report Back
+[Specific paste-back format the implementer returns: confirmation that
+pre-state matched, that patch landed, that post-state matched, and the
+commit SHA.]
+```
+
+### When to Use Between-Session Doc-Sync
+
+- During a long-running campaign with 5+ sessions where coordination docs (CLAUDE.md, sprint-history.md, etc.) drift between sessions.
+- For mechanical updates that don't require operator judgment but DO require precision (specific find/replace with verifiable state transitions).
+- To prevent end-of-sprint doc-sync from accumulating ~12 small edits in one session.
+
+### When NOT to Use
+
+- For substantive content changes that require operator judgment (use a full doc-sync session instead).
+- For changes that touch multiple files (use a doc-sync session that handles them coherently).
+- For tiny single-line changes during the implementer's own session — fold those into the session's own commits with the relevant changes.
+
+<!-- Origin: synthesis-2026-04-26 P34. ARGUS Sprint 31.9 campaign-close ran
+     ~12 between-session doc-sync prompts via the campaign-tracking
+     conversation, each with this structure (pre-verify / patch / post-
+     verify / commit / report-back). Existing doc-sync template covered
+     sprint-end only; this addition covers campaign-internal cadence. -->

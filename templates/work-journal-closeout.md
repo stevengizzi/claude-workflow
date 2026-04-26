@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.1.0 -->
-<!-- last-updated: 2026-03-14 -->
+<!-- workflow-version: 1.2.0 -->
+<!-- last-updated: 2026-04-26 -->
 # Template: Work Journal Close-Out
 
 > **Autonomous runner mode:** The Work Journal (or its equivalent logs) produces
@@ -91,3 +91,44 @@
 > Journal handoff was included in doc-sync prompt."
 
 {corrections or "None — Work Journal handoff was included in doc-sync prompt."}
+
+---
+
+## Hybrid Mode (Non-Standard-Shape Campaigns)
+
+[Use this section instead of the standard Work Journal close-out when the campaign is non-standard-shape — typically audit campaigns (20+ sessions, multi-stage, parallelism), multi-sprint refactors, or migrations. Standard sprints (3–8 serial sessions) use the close-out structure above; do not adopt Hybrid Mode for them.]
+
+A non-standard-shape campaign produces a hybrid handoff document whose top half is campaign-specific and whose bottom half points at this template's standard close-out structure for the final session's deliverable. The campaign coordination surface (a Claude.ai Work Journal conversation, an issue tracker with a campaign label, or a wiki page with a running register — any persistent surface that tracks DEFs, findings, and produces a draftable handoff at close) reads the hybrid handoff once, then ingests paste-able close-out and review blocks from each session per `claude/skills/close-out.md` and `claude/skills/review.md`. At campaign end, the coordination surface produces a filled-in doc-sync prompt per `templates/doc-sync-automation-prompt.md` (human-in-the-loop mode) or a structured close-out block (autonomous mode).
+
+Universal rules apply per the keystone Pre-Flight wiring in `templates/implementation-prompt.md` — the Hybrid Mode handoff does NOT need to re-document them.
+
+### Hybrid Handoff Top Half (Campaign-Specific)
+
+The top half of a hybrid handoff document captures (operator-judgment per campaign — these are typical fields, not a strict schema):
+
+- **Baseline.** Test count, lockfile state, branch state, paper-trading or operational state at campaign start.
+- **Multi-stage execution plan.** A list or DAG of sessions in dependency order; references `templates/stage-flow.md` for visual format if non-linear.
+- **Paste protocol.** Where the operator pastes each session's close-out + review blocks (the campaign coordination surface).
+- **Running register format.** DEFs, findings, deferred items, scope additions, judgment calls — accumulated across sessions, not per-session.
+- **Escalation criteria specific to this campaign.** When to halt and route to the operator vs. continue with CONCERNS.
+- **Campaign regression checklist.** Cross-cutting invariants the campaign must preserve.
+- **Cross-track synthesis** (if multi-track campaign). The campaign's final session(s) produce a narrative covering all tracks plus any cross-track recommendations.
+
+### Hybrid Handoff Bottom Half (Standard Close-Out Reference)
+
+The bottom half of a hybrid handoff points at `templates/work-journal-closeout.md` (this file) §"Sprint summary" through §"Doc sync" for the final session's deliverable. The campaign's final session produces a standard work-journal close-out, just one that has been informed by the multi-session running register accumulated above.
+
+### When NOT to use Hybrid Mode
+
+- Standard sprints with 3–8 serial sessions and a single coordination surface.
+- Single-session impromptus.
+- Sprints where the work fits the standard close-out structure without modification.
+
+If in doubt, use the standard close-out structure; switch to Hybrid Mode only when its accumulated-running-register pattern is clearly necessary.
+
+<!-- Origin: synthesis-2026-04-26 N3.6. Evidence: ARGUS Sprint 31.9 campaign-
+     close used a hybrid pattern — the standard work-journal-closeout
+     template covered the final session's deliverable, but the campaign-
+     internal artifacts (CAMPAIGN-CLOSE-PLAN.md, RUNNING-REGISTER.md,
+     CAMPAIGN-COMPLETENESS-TRACKER.md) sat above it as the campaign-
+     specific layer. Hybrid Mode formalizes that two-layer structure. -->
