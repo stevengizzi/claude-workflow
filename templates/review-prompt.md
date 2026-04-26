@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.1.0 -->
-<!-- last-updated: 2026-03-14 -->
+<!-- workflow-version: 1.2.0 -->
+<!-- last-updated: 2026-04-26 -->
 # Template: Tier 2 Review Prompt
 
 > **Primary path:** The @reviewer subagent is invoked at the end of the
@@ -39,6 +39,10 @@ in the Review Context File and is referenced by path -- not duplicated here.
     Create the file, write the full report (including the structured JSON
     verdict) to it, and commit it. This is the ONE exception to "do not
     modify any files" — the review report file is the sole permitted write.
+
+    ## Pre-Flight
+
+    1. **Read `.claude/rules/universal.md` in full and treat its contents as binding for this review.** The full set of universal RULE entries (currently RULE-001 through RULE-053) applies regardless of whether any specific rule is referenced inline in this prompt — particularly RULE-013 (read-only mode) which governs the entire review session.
 
     ## Review Context
     Read the following file for the Sprint Spec, Specification by Contradiction,

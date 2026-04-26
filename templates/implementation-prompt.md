@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.2.0 -->
-<!-- last-updated: 2026-03-14 -->
+<!-- workflow-version: 1.3.0 -->
+<!-- last-updated: 2026-04-26 -->
 # Template: Implementation Prompt
 
 Fill in all bracketed sections. The structure of this prompt is designed to
@@ -12,11 +12,12 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
 
     ## Pre-Flight Checks
     Before making any changes:
-    1. Read these files to load context:
+    1. **Read `.claude/rules/universal.md` in full and treat its contents as binding for this session.** The full set of universal RULE entries (currently RULE-001 through RULE-053) applies regardless of whether any specific rule is referenced inline in this prompt.
+    2. Read these files to load context:
        - [file path 1]
        - [file path 2]
        - [file path 3]
-    2. Run the test baseline (DEC-328):
+    3. Run the test baseline (DEC-328):
        [IF Session 1 of sprint]:
          Full suite: [full test command with -n auto]
          Expected: [N] tests, all passing
@@ -30,8 +31,8 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     N. Kill orphaned test workers from prior sessions:
        `pkill -f "vitest/dist/workers" 2>/dev/null; echo "Cleaned"`
        This prevents RAM accumulation from stuck Vitest fork workers.
-    3. Verify you are on the correct branch: [branch name]
-    4. [Any other pre-conditions]
+    4. Verify you are on the correct branch: [branch name]
+    5. [Any other pre-conditions]
 
     [PLANNING NOTE (DEC-328): When generating implementation prompts:
       - Session 1 pre-flight: full suite with `-n auto` for parallel execution
@@ -69,6 +70,39 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     - Do NOT modify: [explicit list of files/modules/functions]
     - Do NOT change: [behaviors, interfaces, contracts to preserve]
     - [Any other constraints]
+    - Do NOT cross-reference other session prompts. This prompt is standalone;
+      it must be pasteable into a fresh Claude Code session with zero knowledge
+      of other session prompts. Even sessions with clear coupling handle the
+      coupling via prose instructions referencing the state of `main`, not via
+      cross-prompt references. (Origin: synthesis-2026-04-26 ID3.1.)
+
+    ## Operator Choice (if applicable)
+
+    [Include this section for sessions that present multiple architectural options
+    where operator judgment is required between option A and option B (or A/B/C).
+    This template lets the operator pre-check before pasting into Claude Code, and
+    downstream sessions reference the resulting choice via git state, not via
+    re-prompting.]
+
+    The operator must check ONE option below before this prompt is pasted into
+    Claude Code. If the operator fails to check an option, Claude Code defaults
+    to the option labeled "default" or, if none is labeled, the smallest-blast-
+    radius option, and surfaces this default-application in the close-out's
+    Judgment Calls section.
+
+    - [ ] Option A (default — smallest blast radius): [description]
+    - [ ] Option B: [description]
+    - [ ] Option C: [description]
+
+    Downstream sessions that depend on this choice should NOT re-prompt the
+    operator. Instead, they reference the state of `main` after this session's
+    commit, with conditional instructions per option (e.g., "if Option B was
+    chosen, this session's work collapses to X").
+
+    <!-- PLANNING NOTE: Origin: synthesis-2026-04-26 N3.5. Use this section only
+         when an architectural decision genuinely requires operator judgment
+         mid-sprint and downstream sessions depend on the choice. Don't use
+         for cosmetic preferences. -->
 
     ## Canary Tests (if applicable)
     Before making any changes, run the canary-test skill in .claude/skills/canary-test.md
@@ -270,3 +304,22 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
 
     ## Sprint-Level Escalation Criteria (for @reviewer)
     [Paste the sprint-level escalation criteria here]
+
+    ## Section Ordering
+
+    This template's section order matches the implementation execution order:
+    Pre-Flight → Objective → Requirements → Constraints → Operator Choice (if
+    applicable) → Canary Tests (if applicable) → Test Targets → Definition of
+    Done → Regression Checklist → Close-Out → Tier 2 Review → Post-Review Fix
+    Documentation → Session-Specific Review Focus → Sprint-Level Regression
+    Checklist → Sprint-Level Escalation Criteria.
+
+    Visual order matches execution order so Claude Code instances following the
+    template top-to-bottom proceed in the correct sequence. Do NOT reorder
+    sections when filling in the template — the close-out report's
+    self-assessment gates whether commit happens, and Tier 2 review runs after
+    commit. Reordering visually inverts this and risks confusion.
+
+    <!-- PLANNING NOTE: Origin: synthesis-2026-04-26 N3.8. Without this note,
+         prompts have been generated where Tier 2 Review precedes Commit
+         visually even when prose described correct execution order. -->

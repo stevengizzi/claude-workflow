@@ -1,7 +1,7 @@
 # Universal Rules - Cross-Project Rule Library
 # Loaded into .claude/rules/ for every project.
 # Source: Empirical patterns from ARGUS (65 convos, 21 sprints), MuseFlow (11 convos, 4 sprints), Grove (11 convos, 6 phases).
-# Version: 1.0
+# Version: 1.1
 
 ---
 
@@ -119,10 +119,11 @@ RULE-038: At the start of every session, grep-verify every factual claim the pro
 - **Grep-observable claims.** If the prompt cites a count (e.g., "9 `@patch` decorators in `test_x.py`", "unused import `Foo`"), re-grep before applying the suggested fix. The observation may no longer hold.
 - **Metric values.** If the prompt cites a measured metric (coverage %, LOC count, warning count, file count, test count), re-measure at session start and treat the re-measurement as authoritative. Audit values are directional flags, not ground truth.
 - **Tracker nicknames vs filenames.** Planning trackers often label sessions by thematic nickname ("frontend, solo") while the actual spec file is named for its scope ("experiments-and-learning-loop"). Before drafting a kickoff or acting on a tracker entry, grep the actual spec filename.
+- **Kickoff statistics in close-outs.** Closeouts should explicitly disclose any kickoff-vs-actual discrepancies with attribution rather than quietly conform to the kickoff's stated numbers. Treating kickoff statistics as directional input requiring grep-verification is RULE-038's session-start posture; surfacing discrepancies in the closeout is the disclosure follow-through. Don't propagate a wrong number from kickoff to summary just because the kickoff said it.
 
 When the re-verification disagrees with the prompt, mark the finding as RESOLVED-VERIFIED (if the fix already appears to be in place) or flag the discrepancy in the close-out — do not invent a fix for a claim that no longer holds.
 
-<!-- Origin: Sprint 31.9 retro, P6 + P12 + P13 + P19 + P22 (consolidated).
+<!-- Origin: Sprint 31.9 retro, P6 + P12 + P13 + P19 + P22 + synthesis-2026-04-26 P28 (consolidated).
      Evidence: FIX-04/06/07 hit repeated spec-path drift (CSV-garbled line drifts;
      Finding 17 pointed at position_sizer.py but the real site was
      quality_engine.py). FIX-13c re-measured AI module coverage and found 3 of 4
@@ -130,7 +131,12 @@ When the re-verification disagrees with the prompt, mark the finding as RESOLVED
      pattern also hit F22/F24 in FIX-13a where "9 @patch decorators" and "unused
      AfternoonMomentumStrategy import" had both gone stale between audit and
      session. Stage 6 was tracker-nicknamed "frontend, solo" but FIX-08's actual
-     scope was backend-only. -->
+     scope was backend-only. Evidence for P28: SPRINT-CLOSE-A-closeout.md §1
+     corrected the kickoff's "24 closed DEFs" figure to the grep-verified 19
+     (5 of the 24 — DEF-152/153/154/158/161 — were closed by earlier campaign
+     sessions before IMPROMPTU-04 anchored the campaign-close window); the
+     implementer flagged the discrepancy in closeout via grep-verify rather
+     than silent conformance. -->
 
 RULE-039: When the prompt describes a risky batch edit (large file refactor, multi-site rename, cross-file move), stage the work as: (1) read-only exploration, (2) structured findings report with the concrete change list, (3) halt, (4) operator confirms the list, (5) edit. The in-session report + halt is the mechanism that makes the final edit pass surgical. Skipping the report step collapses risky edits into guess-and-check and has caught out multiple sessions.
 
@@ -273,6 +279,49 @@ Operationally this implies:
      8 Wave 2 barrier, FIX-13c (3 commits), and Stage 8 Wave 3 barrier —
      unmasked only when the FIX-13c anthropic ImportError happened to fail
      fast enough to produce visible output. -->
+
+RULE-052: When CI turns red for a known cosmetic reason, explicitly log that assumption at each subsequent commit rather than treating it as silent ambient noise. The test is: "if a genuine regression slipped in, would I still notice?" CI-discipline drift on a known-cosmetic red can mask a real regression for the duration of the streak; without per-commit acknowledgment, the cosmetic-status assumption hardens into ambient noise. Operationally: each commit that pushes onto a red-CI baseline must include in its message body a one-line assertion of the cosmetic cause + a verification grep that the cosmetic cause hasn't shifted.
+
+<!-- Origin: synthesis-2026-04-26 P27. Evidence: Sprint 31.9's 6-commit
+     CI-red streak between Apr 22 and Apr 24 was correctly diagnosed as
+     cosmetic (DEF-205 date-decay) but had masked any potential real
+     regression for ~24 hours because each subsequent commit treated the
+     red status as ambient. TEST-HYGIENE-01 closed DEF-205 and restored
+     the 5,080 baseline; the streak was retrospectively confirmed cosmetic-
+     only, but the period of unverified status was a real risk window. -->
+
+---
+
+## 16. Fix Validation
+
+RULE-051: When validating a fix against a recurring symptom, verify against the mechanism signature (e.g., a measurable doubling ratio, a specific log-line correlation, a checksum), not the symptom aggregate (e.g., "the bug appears at EOD"). The mechanism signature is the falsifiable part; the symptom aggregate is the dependent variable. Any fix-validation session should explicitly identify the mechanism signature before running the validation. If the mechanism signature was preserved across debrief docs, a recurring symptom can be correctly attributed to a NEW mechanism rather than misattributed as the previous bug regressing.
+
+<!-- Origin: synthesis-2026-04-26 P26. Evidence: ARGUS Apr 24 paper-session
+     debrief preserved the 2.00× math from the DEF-199 fix validation
+     (yesterday's mechanism signature). When 44 unexpected shorts surfaced
+     today, the 1.00× ratio (set-equality, not 2× doubling) discriminated
+     DEF-199 (closed) from DEF-204 (new mechanism: bracket children without
+     OCA + side-blind reconciliation). Without the preserved mechanism
+     signature, today's cascade would have been misattributed as a
+     DEF-199 regression and IMPROMPTU-04 would have been incorrectly
+     reopened. Captured in IMPROMPTU-11-mechanism-diagnostic.md
+     §Retrospective Candidate. -->
+
+---
+
+## 17. Architectural-Seal Verification
+
+RULE-053: Architecturally-sealed documents (e.g., FROZEN markers on long-form analysis files, sealed sprint folders, ARCHIVE-banner files) require defensive verification at session start, not just trust in the kickoff's instructions to avoid them. Any session that operates near sealed/frozen documents should encode the seal as a verifiable assertion at session start (e.g., grep for the FROZEN marker; halt if absent). The verification protects against the seal being silently removed elsewhere — without it, a future kickoff's avoidance instruction would silently bypass an important architectural decision if the marker is gone.
+
+This rule is a sibling of RULE-038 (session-start grep-verification of factual claims) but distinct: RULE-038 verifies external assertions about current code state; RULE-053 verifies positive assertions about sealed-content protection. Action-on-failure differs: RULE-038 disagreement → flag/ignore the stale claim; RULE-053 missing seal → escalate (the seal's removal is itself the issue, not the work being attempted).
+
+<!-- Origin: synthesis-2026-04-26 P29. Evidence: SPRINT-CLOSE-B-closeout.md
+     §2 documents pre-flight check #5 explicitly grep-verified the
+     `process-evolution.md` FROZEN marker still existed before allowing
+     the session to proceed. If a future operator removes the freeze
+     marker, the kickoff's avoidance instruction would silently bypass
+     the architectural decision. Defensive verification at session start
+     is the protection. -->
 
 ---
 

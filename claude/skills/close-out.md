@@ -1,3 +1,5 @@
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-04-26 -->
 # Skill: Close-Out (Tier 1 Self-Review)
 
 ## Trigger
@@ -109,7 +111,14 @@ After generating the close-out report:
 3. Commit with message: `[Sprint X.Y] [session scope summary]`
 4. Push to remote: `git push`
 
-Do NOT push if self-assessment is FLAGGED — wait for developer review of the close-out.
+**Do NOT stage, commit, or push if self-assessment is FLAGGED.** The original wording said "Do NOT push if FLAGGED," but pushing was already too late — staged-but-uncommitted changes still risk being committed by the next operator action, and committed-but-unpushed changes still cause CI runs on the next push. Stop earlier in the pipeline: if FLAGGED, write the close-out report, surface the FLAGGED finding to the operator, and wait for guidance before any git operation beyond the close-out commit itself.
+
+<!-- Origin: synthesis-2026-04-26 (strengthening of P4-era close-out
+     discipline). The original "Do NOT push if FLAGGED" wording allowed
+     the implementer to stage + commit, then halt before push — but
+     staged-and-committed work has implicit downstream effects (next
+     git operation, IDE state) that the FLAGGED gate should prevent
+     entirely. Strengthen to "Do NOT stage, commit, or push." -->
 
 ### Step 4: CI Verification
 After pushing, wait for CI to complete on the session's final commit and record
