@@ -93,6 +93,9 @@ Read during artifact generation (Phase C/D):
 - `templates/implementation-prompt.md`
 - `templates/review-prompt.md`
 
+### Campaign Orchestration / Absorption / Close
+- **Campaign Orchestration / Absorption / Close** — read `protocols/campaign-orchestration.md` for the full protocol covering campaign absorption (§1), supersession (§2), authoritative-record preservation (§3), cross-track close-out (§4), pre-execution gates (§5), naming conventions (§6), DEBUNKED status (§7), absorption-vs-sequential decision matrix (§8), and the two-session SPRINT-CLOSE option (§9). Also read `protocols/sprint-planning.md` for per-session planning within the campaign.
+
 ### Strategic Check-In
 - `protocols/strategic-check-in.md`
 
@@ -117,6 +120,7 @@ Read during artifact generation (Phase C/D):
 | Tier 3 Review | `protocols/tier-3-review.md` | Architectural review at phase boundaries |
 | In-Flight Triage | `protocols/in-flight-triage.md` | Mid-sprint issue classification |
 | Impromptu Triage | `protocols/impromptu-triage.md` | Scope and plan unplanned work |
+| Campaign Orchestration | `protocols/campaign-orchestration.md` | Multi-session campaigns with persistent coordination state (5+ sessions, multi-track, accumulating registers) |
 | Strategic Check-In | `protocols/strategic-check-in.md` | Periodic direction review |
 | Codebase Health Audit | `protocols/codebase-health-audit.md` | Systematic code quality review |
 | Retrofit Survey | `protocols/retrofit-survey.md` | Bring existing project into workflow |
