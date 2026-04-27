@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-03-12 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-04-26 -->
 # Protocol: Sprint Planning
 
 **Context:** Claude.ai conversation(s)
@@ -11,6 +11,8 @@
 ## When to Use
 At the start of every sprint. This is the single most important conversation in
 the sprint cycle -- it produces everything the implementation and review phases need.
+
+For multi-session campaigns with persistent coordination state (5+ sessions, multi-track, accumulating registers), see `protocols/campaign-orchestration.md` for the coordination machinery layered on top of per-session sprint planning.
 
 ## Conversation Structure
 
