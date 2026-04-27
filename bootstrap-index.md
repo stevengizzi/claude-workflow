@@ -149,6 +149,8 @@ Read during artifact generation (Phase C/D):
 | Conformance Prompt | `templates/spec-conformance-prompt.md` | Runner conformance checks |
 | Triage Prompt | `templates/tier-2.5-triage-prompt.md` | Runner automated triage |
 | Work Journal Close-Out | `templates/work-journal-closeout.md` | Sprint close (Work Journal conversation) |
+| Stage Flow | `templates/stage-flow.md` | DAG artifact for multi-track or fork-join campaign execution graphs. ASCII / Mermaid / ordered-list formats. |
+| Scoping Session Prompt | `templates/scoping-session-prompt.md` | Read-only scoping-session template producing structured findings + generated fix prompt for a follow-on implementation session. |
 
 ## Schema Index
 
