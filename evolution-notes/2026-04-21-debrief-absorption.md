@@ -3,7 +3,7 @@
 **Date:** 2026-04-21
 **Conversation title:** *<set by operator — suggested: "Market Session Debrief — 2026-04-21 + Campaign Absorption">*
 **Contributes to:** `workflow/protocols/codebase-health-audit.md` (new patterns for post-audit-planning absorption), `workflow/protocols/market-session-debrief.md` (downstream coupling signals), `workflow/protocols/impromptu-triage.md` (scoping-before-fix variant), possibly new `workflow/templates/stage-flow.md` and `workflow/templates/scoping-session-prompt.md`.
-**Synthesis status:** SYNTHESIZED in synthesis-2026-04-26 (commit <pending-final-synthesis-sprint-commit>). See `protocols/campaign-orchestration.md`, `protocols/operational-debrief.md`, `protocols/codebase-health-audit.md` for the resulting metarepo additions.
+**Synthesis status:** SYNTHESIZED in synthesis-2026-04-26 (commit e23a3c4). See `protocols/campaign-orchestration.md`, `protocols/operational-debrief.md`, `protocols/codebase-health-audit.md` for the resulting metarepo additions.
 
 ## What this conversation produced
 

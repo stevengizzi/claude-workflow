@@ -1,7 +1,33 @@
 # Universal Rules - Cross-Project Rule Library
 # Loaded into .claude/rules/ for every project.
 # Source: Empirical patterns from ARGUS (65 convos, 21 sprints), MuseFlow (11 convos, 4 sprints), Grove (11 convos, 6 phases).
-# Version: 1.1
+# Version: 1.2
+
+---
+
+## Section Index
+
+| § | Section | RULEs |
+|---|---|---|
+| 1 | Prompt Adherence | RULE-001 through RULE-005 |
+| 2 | Scope Discipline | RULE-006 through RULE-009 |
+| 3 | Review Compliance | RULE-010 through RULE-013 |
+| 4 | Documentation Integrity | RULE-014 through RULE-018 |
+| 5 | Codebase Hygiene | RULE-019 through RULE-024 |
+| 6 | Compaction Defense | RULE-025 through RULE-029 |
+| 7 | Diagnostic Protocol | RULE-030 through RULE-033 |
+| 8 | Research and Infrastructure | RULE-034 through RULE-037 |
+| 9 | Session-Start Verification | RULE-038, RULE-039 |
+| 10 | Empirical Evidence Discipline | RULE-040 |
+| 11 | Flake Discipline | RULE-041 |
+| 12 | Anti-Patterns in Code | RULE-042, RULE-043 |
+| 13 | Test Discipline | RULE-044 through RULE-048 |
+| 14 | Repath + Mechanical Migration Hazards | RULE-049 |
+| 15 | CI Verification Discipline | RULE-050, RULE-052 |
+| 16 | Fix Validation | RULE-051 |
+| 17 | Architectural-Seal Verification | RULE-053 |
+
+<!-- The non-monotonic RULE-NN order across §15/§16/§17 is intentional: sections are organized topically. RULE-051 lands in Fix Validation (§16), RULE-052 lands in CI Verification (§15) alongside RULE-050. Use this index to find a RULE by number. -->
 
 ---
 

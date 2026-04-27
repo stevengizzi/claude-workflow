@@ -1,4 +1,4 @@
-<!-- workflow-version: 1.3.0 -->
+<!-- workflow-version: 1.4.0 -->
 <!-- last-updated: 2026-04-26 -->
 # Template: Implementation Prompt
 
@@ -304,6 +304,16 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
 
     ## Sprint-Level Escalation Criteria (for @reviewer)
     [Paste the sprint-level escalation criteria here]
+
+    ### Verification Grep Precision
+
+    When kickoffs include verification grep commands, prefer the more precise patterns:
+
+    - **Section counting:** use `^## [1-9]\.` (anchor + literal dot) rather than `^## [0-9]` to avoid double-counting `## 10.`, `## 11.`, etc.
+    - **Human-authored content with TitleCase:** use `grep -i` for content like Markdown bold-list section names (`**Recent-bug count.**`, `**Work-execution state.**`). Lowercase patterns will return false negatives against TitleCase source.
+    - **Token-presence checks across rejection-framed content:** when checking that a rejected pattern is absent, scan only validation logic, not docstrings/rationale blocks. A rejection rationale that names the token is not a reintroduction.
+
+    <!-- Origin: synthesis-2026-04-26 retrospective. S3, S5, S6 each had at least one verification grep that needed re-running with -i or a tightened pattern. The grep imprecision did not change verdicts but added review-time noise. -->
 
     ## Section Ordering
 

@@ -3,7 +3,7 @@
 **Date:** 2026-04-21
 **Conversation title:** ARGUS audit Phase 1 + Phase 2 planning and execution
 **Contributes to:** `workflow/protocols/codebase-health-audit.md`
-**Synthesis status:** SYNTHESIZED in synthesis-2026-04-26 (commit <pending-final-synthesis-sprint-commit>). See `protocols/campaign-orchestration.md`, `protocols/operational-debrief.md`, `protocols/codebase-health-audit.md` for the resulting metarepo additions.
+**Synthesis status:** SYNTHESIZED in synthesis-2026-04-26 (commit e23a3c4). See `protocols/campaign-orchestration.md`, `protocols/operational-debrief.md`, `protocols/codebase-health-audit.md` for the resulting metarepo additions.
 
 ---
 

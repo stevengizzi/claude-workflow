@@ -19,11 +19,10 @@ Checks:
      row with decision=fix-now or fix-later (per the fingerprint-before-
      behavior-change pattern).
 
-This script does NOT validate safety tags. The 4-tag safety taxonomy
-(safe-during-trading / weekend-only / read-only-no-fix-needed /
-deferred-to-defs) is empirically rejected per synthesis-2026-04-26
-Phase A pushback round 2; see protocols/codebase-health-audit.md
-Phase 2 'Anti-pattern (do not reinvent)' addendum for rationale.
+This script does NOT validate safety tags. The 4-tag safety taxonomy was
+empirically rejected per synthesis-2026-04-26 Phase A pushback round 2;
+see protocols/codebase-health-audit.md §2.9 "Anti-pattern (do not reinvent)"
+for the rationale and the canonical list of rejected tokens.
 
 Origin: synthesis-2026-04-26.
 """
