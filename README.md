@@ -12,16 +12,16 @@ The workflow is designed for a **two-Claude architecture**: Claude.ai handles st
 
 ```
 claude-workflow/
-├── protocols/           # How to run each type of conversation (14 protocols)
-├── templates/           # Fill-in-the-blank sprint artifacts (10 templates)
+├── protocols/           # How to run each type of conversation (19 protocols)
+├── templates/           # Fill-in-the-blank sprint artifacts (13 templates)
 ├── schemas/             # Structured output schemas for runner/review (4 schemas)
 ├── claude/              # Claude Code configuration (universal)
 │   ├── skills/          # close-out, review, canary-test, diagnostic, doc-sync
-│   ├── rules/           # universal.md (36 cross-project rules)
+│   ├── rules/           # universal.md (53 cross-project rules)
 │   └── agents/          # builder, reviewer, doc-sync-agent
 ├── runner/              # Autonomous Sprint Runner (Python package, 13 modules)
 ├── scaffold/            # New project starter kit
-├── scripts/             # scaffold.sh, setup.sh, sync.sh
+├── scripts/             # scaffold.sh, setup.sh, sync.sh, phase-2-validate.py
 ├── bootstrap-index.md   # Claude.ai project knowledge file (the key integration point)
 ├── VERSIONING.md        # Version policy
 └── MIGRATION.md         # Guide for migrating existing projects (e.g., ARGUS)
