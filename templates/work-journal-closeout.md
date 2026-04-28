@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.2.0 -->
-<!-- last-updated: 2026-04-26 -->
+<!-- workflow-version: 1.3.0 -->
+<!-- last-updated: 2026-04-27 -->
 # Template: Work Journal Close-Out
 
 > **Autonomous runner mode:** The Work Journal (or its equivalent logs) produces
@@ -16,6 +16,29 @@
 > In both modes, the close-out data prevents the #1 doc-sync failure mode: DEF
 > number collisions between the Work Journal's assignments and the doc-sync
 > session's independent assignments.
+
+---
+
+## Per-Session Register Discipline (Reference)
+
+This template is the SPRINT-END deliverable structure. For sprints subject
+to per-session register discipline (per `protocols/in-flight-triage.md` §
+"Per-Session Register Discipline"), the per-session artifact at
+`docs/sprints/<sprint-id>/work-journal-register.md` is produced incrementally
+using the same structure as below. Sprint-end becomes a formatting and
+framing exercise consuming the latest register artifact rather than a
+memory exercise reconstructing state from accumulated session pastes.
+
+When this template is used at sprint-end with per-session register
+discipline in effect:
+1. The bulk of the content is copied from the latest register artifact's
+   sections (DECs, DEFs, risks, resolved items, watchlist, etc.)
+2. The framing prompt sections (sprint summary narrative, doc-sync prompt
+   handoff, list of sprint-folder files for the doc-sync session) are
+   produced fresh at sprint-end
+3. The register artifact and the sprint-end close-out are then equivalent
+   in content but differ in framing — the close-out adds the sprint-end
+   narrative; the register artifact is the structured truth feeding it
 
 ---
 

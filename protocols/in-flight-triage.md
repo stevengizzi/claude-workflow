@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.1.0 -->
-<!-- last-updated: 2026-03-14 -->
+<!-- workflow-version: 1.2.0 -->
+<!-- last-updated: 2026-04-27 -->
 # Protocol: In-Flight Triage
 
 **Context:** Claude.ai conversation (Sprint Work Journal)
@@ -24,6 +24,102 @@ The work journal conversation persists for the duration of the sprint.
 
 If the work journal conversation grows long enough to risk compaction, start a
 fresh conversation with the handoff prompt plus a brief "issues so far" summary.
+
+## Per-Session Register Discipline (Compaction Mitigation)
+
+For sprints expected to exceed 8 implementation sessions OR sprints with
+multiple Tier 3 review checkpoints, the Work Journal conversation faces
+compaction risk that can silently corrupt register state. The mitigation
+is to externalize the register to a per-session-refreshed markdown
+artifact at `docs/sprints/<sprint-id>/work-journal-register.md` in the
+project repo.
+
+### When to use
+
+REQUIRED for:
+- Sprints with ≥ 8 implementation sessions
+- Sprints with ≥ 2 Tier 3 review checkpoints
+- Any sprint where the operator explicitly requests it
+
+OPTIONAL but RECOMMENDED for:
+- Sprints with 5-7 sessions where conversation density is high
+- Sprints with multiple parallel tracks (so register state is high-volume)
+
+NOT REQUIRED for:
+- Sprints with ≤ 4 sessions (compaction risk is minimal)
+- Single-session impromptus
+
+### Discipline
+
+1. **At sprint start (Work Journal acknowledgment turn):** Identify whether
+   the discipline applies per "When to use" criteria. Surface this to
+   operator for explicit confirmation if not already specified in the
+   sprint plan or handoff prompt.
+
+2. **First register artifact:** Produce after the FIRST session close-out
+   lands cleanly OR after Tier 3 #1 if there is one before any session
+   completes. This establishes the initial state.
+
+3. **Refresh cadence:** AFTER EVERY SESSION CLOSE-OUT and AFTER EVERY
+   TIER 3 VERDICT — no exceptions. Even sessions that don't materially
+   change the register (e.g., a session adding no DEFs, no DECs, no
+   scope additions, no resolved carry-forwards, only test count) receive
+   a refresh with updated test counts, commit SHAs, and timestamps. The
+   principle: artifact is always current to the most recent
+   session/verdict, full stop. No exceptions, no judgment calls about
+   whether "this session warranted a refresh."
+
+4. **Operator action per refresh:** Operator commits the refreshed file
+   to the project repo. The git history of the file IS the session-grain
+   audit trail.
+
+5. **Conflict resolution:** If the Work Journal conversation and the
+   register artifact ever conflict, the artifact wins. The conversation
+   IS the editing surface; the artifact is persisted truth.
+
+### Required register sections
+
+The artifact contains AT MINIMUM the following sections (mirrors
+`templates/work-journal-closeout.md` standard structure but produced
+incrementally):
+
+- Last refresh metadata (timestamp, anchor commit, sessions complete,
+  Tier 3 reviews complete, active session, sprint phase)
+- Sprint identity (pinned context — predecessor, mode, primary defects,
+  reserved DECs)
+- Test tally (per-session deltas + cumulative)
+- DECs (materialized + reserved + freed)
+- DEFs (filed during sprint + filed pre-sprint with status + anticipated
+  but not filed with reasons)
+- Risks filed
+- Resolved carry-forward items (cumulative)
+- Outstanding code-level items (sprint-tracked, not DEF-worthy)
+- Carry-forward watchlist (active)
+- Pre-applied operator decisions (re-stated for self-containment)
+- Operator decisions log (mid-sprint — timestamped)
+- Tier 3 reviews (with verdicts + outcomes)
+- Session order (with check-marks for complete sessions)
+- Sprint-end deliverable forward-looking note
+
+### Continuation strategy
+
+Within a single Work Journal conversation, continue through compaction
+events. Trust the register artifact as the backstop. The conversation
+preserves fingertip context (sprint texture, operator decision style,
+patterns being tracked) that compaction lossy-summarizes; the artifact
+preserves the structured state.
+
+Open a fresh Work Journal conversation only if:
+- Compaction visibly damages register state (Work Journal claims a
+  disposition that contradicts the artifact)
+- The conversation gets ratty and Work Journal asks operator to re-paste
+  things
+- A natural sprint-phase boundary makes a clean slate strategically
+  valuable (e.g., between Tier 3 #1 and Tier 3 #2 of a multi-track sprint)
+
+Fresh-conversation onboarding takes 1-2 turns: paste the original handoff
+prompt + the register artifact at its latest state + a brief continuation
+note (sessions complete, Tier 3 verdicts complete, what's next).
 
 ## Issue Categories
 
