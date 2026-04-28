@@ -1,3 +1,5 @@
+<!-- workflow-version: 1.0.0 -->
+<!-- last-updated: 2026-04-28 -->
 # Schema: Structured Close-Out Appendix
 
 **Referenced by:** DEC-280
@@ -61,6 +63,10 @@ The runner extracts this block via regex: `` ```json:structured-closeout\n(.*?)\
     "session": {
       "type": "string",
       "description": "Session identifier (e.g., 'S1a', 'S3b', 'S2-fix-1')"
+    },
+    "mid_sprint_doc_sync_ref": {
+      "type": "string",
+      "description": "Optional. Path to the mid-sprint doc-sync manifest this close-out's session was scheduled by, if any. Set when the close-out's session was added to the sprint by a mid-sync (e.g., an impromptu added by a Tier 3 verdict). Sprint-close uses this field to correlate close-outs with their originating mid-syncs."
     },
     "verdict": {
       "type": "string",

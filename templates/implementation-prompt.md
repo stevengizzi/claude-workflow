@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.4.0 -->
-<!-- last-updated: 2026-04-26 -->
+<!-- workflow-version: 1.5.0 -->
+<!-- last-updated: 2026-04-28 -->
 # Template: Implementation Prompt
 
 Fill in all bracketed sections. The structure of this prompt is designed to
@@ -32,7 +32,13 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
        `pkill -f "vitest/dist/workers" 2>/dev/null; echo "Cleaned"`
        This prevents RAM accumulation from stuck Vitest fork workers.
     4. Verify you are on the correct branch: [branch name]
-    5. [Any other pre-conditions]
+    5. **Run the structural-anchor grep-verify commands** from the "Files to
+       Modify" section below. For each entry, run the verbatim grep-verify
+       command and confirm the anchor still resolves to the expected location.
+       If drift is detected, disclose under RULE-038 in the close-out and
+       proceed against the actual structural anchors. If the anchor is not
+       found at all, HALT and request operator disposition rather than guess.
+    6. [Any other pre-conditions]
 
     [PLANNING NOTE (DEC-328): When generating implementation prompts:
       - Session 1 pre-flight: full suite with `-n auto` for parallel execution
@@ -65,6 +71,36 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     1. In [file path], [specific change with detail]
     2. In [file path], [specific change with detail]
     3. [etc.]
+
+    ## Files to Modify
+
+    For each file the session edits, specify:
+
+    1. **Path** (absolute from repo root).
+    2. **Structural anchor(s)** identifying the edit location. Use one or more of (in priority order):
+       - Function/method name (with class context if applicable).
+       - Distinctive comment or docstring regex.
+       - Distinctive call-pattern regex.
+       - File-section heading (for docs).
+    3. **Edit shape** (insertion, replacement, deletion).
+    4. **Pre-flight grep-verify command** (verbatim) the implementer runs before editing to confirm the anchor still resolves to the expected location.
+
+    Line numbers MAY appear as directional cross-references but are NEVER the sole anchor. Where line numbers appear, they are flagged "directional only — verify via grep" with the grep command immediately following.
+
+    Example:
+
+        - `argus/execution/ibkr_broker.py`:
+          - Anchor: function `_emit_ibkr_auth_failure_alert` (does not exist yet; new method).
+          - Edit shape: insertion immediately after the existing `_on_error` method.
+          - Pre-flight grep-verify:
+            $ grep -n "def _on_error" argus/execution/ibkr_broker.py
+            # Expected: 1 hit. (Directional only.)
+
+    <!-- PLANNING NOTE: Origin: recurring stale-line-number disclosures across
+         multiple Tier 3 reviews (Tier 3 #1 flagged the pattern; Sprint 31.91
+         S5b's RULE-038 disclosure made it concrete). Absolute line numbers
+         drift between prompt authoring and prompt consumption; structural
+         anchors do not. See `protocols/sprint-planning.md` v1.2.0+. -->
 
     ## Constraints
     - Do NOT modify: [explicit list of files/modules/functions]
@@ -333,3 +369,9 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     <!-- PLANNING NOTE: Origin: synthesis-2026-04-26 N3.8. Without this note,
          prompts have been generated where Tier 2 Review precedes Commit
          visually even when prose described correct execution order. -->
+
+    <!-- This template applies to all impl prompts authored under
+         `templates/implementation-prompt.md` v1.5.0+. Impl prompts produced by
+         mid-sprint doc-syncs (per `protocols/mid-sprint-doc-sync.md`) follow
+         this same template; the manifest produced by the mid-sync references
+         the impl prompts produced. -->

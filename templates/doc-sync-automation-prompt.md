@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.1.0 -->
-<!-- last-updated: 2026-04-26 -->
+<!-- workflow-version: 1.2.0 -->
+<!-- last-updated: 2026-04-28 -->
 # Template: Doc-Sync Automation Prompt
 
 This template is populated by the runner after all sessions complete and
@@ -16,6 +16,28 @@ replaced at runtime.
     or configuration files. Only modify documentation files.
 
     Follow the doc-sync skill in .claude/skills/doc-sync.md.
+
+    ## Pre-Sync: Read Mid-Sprint Manifests
+
+    Before applying any transitions, list and read every mid-sprint doc-sync manifest in the sprint folder:
+
+        ls docs/sprints/{SPRINT}/*-doc-sync-manifest.md
+
+    For each manifest:
+
+    1. Read in full.
+    2. Extract the "DEF transitions owed at sprint-close" table.
+    3. Extract the "DECs deferred to sprint-close" table.
+    4. Extract the "Architecture / catalog freshness items deferred to sprint-close" table.
+    5. Verify each claimed transition against actual sprint state:
+       - DEF transitions: confirm the owning session/impromptu close-out landed CLEAR. If not, the DEF stays OPEN; surface in sprint-close output.
+       - DEC writes: confirm the cross-references are now resolvable (DEFs resolved, sessions complete).
+       - Catalog freshness items: confirm the underlying surfaces exist as expected.
+    6. Build the consolidated transition list as the input to the rest of the doc-sync.
+
+    If any manifest is malformed or claims transitions inconsistent with sprint state, HALT and surface to operator. Do not proceed with partial transitions.
+
+    The mid-sync protocol that produces these manifests is `protocols/mid-sprint-doc-sync.md`.
 
     ## Sprint Summary
     Sprint: {SPRINT}
@@ -95,6 +117,10 @@ replaced at runtime.
     8. **Work Journal Close-Out** — If provided, use as source of truth for
        DEF assignments and resolved items. Cross-reference against all DEF
        entries created in this session.
+
+    DEF transitions: apply per the consolidated list built from mid-sync manifests in the Pre-Sync step above. Each transition should cite both the manifest source AND the owning session/impromptu close-out commit.
+
+    DEC writes: apply per the consolidated list. DECs deferred from mid-syncs should reference the original verdict / closeout artifact that prepared the draft text.
 
     {ADDITIONAL_TARGET_DOCUMENTS}
 

@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.1.0 -->
-<!-- last-updated: 2026-04-26 -->
+<!-- workflow-version: 1.2.0 -->
+<!-- last-updated: 2026-04-28 -->
 # Protocol: Impromptu Triage
 
 **Context:** Claude.ai conversation (brief) followed by Claude Code implementation
@@ -122,3 +122,9 @@ The triage conversation produces:
 3. Implementation prompt (with close-out)
 4. Tier 2 review prompt
 5. Notes on what planned work (if any) needs adjustment
+
+### When the impromptu changes DEF-table state
+
+If the impromptu files a new DEF, transitions an existing DEF's status, or otherwise modifies CLAUDE.md's DEF table, the impromptu's close-out triggers a mid-sprint doc-sync per `protocols/mid-sprint-doc-sync.md`. The mid-sync produces a manifest enumerating the DEF transitions owed at sprint-close.
+
+DEFs filed by impromptus land in OPEN status with explicit routing. DEFs resolved by the impromptu may land directly as RESOLVED-IN-SPRINT if the close-out provides full resolution attribution, but the manifest pattern is preferred for sprint-close reconciliation discipline.

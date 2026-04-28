@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.1.0 -->
-<!-- last-updated: 2026-04-26 -->
+<!-- workflow-version: 1.2.0 -->
+<!-- last-updated: 2026-04-28 -->
 # Protocol: Sprint Planning
 
 **Context:** Claude.ai conversation(s)
@@ -308,6 +308,38 @@ With finalized spec-level artifacts in hand, generate prompts:
    Session 1 and brings issues to it throughout the sprint.
 
 After each artifact: save it, confirm saved, then request the next.
+
+### Implementation prompts: structural anchors over line numbers
+
+Implementation prompts MUST reference structural anchors rather than absolute line numbers. The recurring stale-line-number disclosures across multiple Tier 3 reviews (Tier 3 #1 flagged the pattern; Sprint 31.91 S5b's RULE-038 disclosure made it concrete with `:453` actual `~:570` and `:531` actual `~:416-420`) demonstrate that absolute line numbers drift between prompt authoring and prompt consumption.
+
+Required anchor types (use one or more, in priority order):
+
+1. **Function name + class name (if applicable):** e.g., "in `_emit_ibkr_auth_failure_alert` method of `IBKRBroker` class".
+2. **Distinctive comment / docstring regex:** e.g., "the line immediately preceding the comment beginning `# Sprint 31.91 Session 5a.2 (DEF-213): rehydrate alert state`".
+3. **Distinctive call-pattern regex:** e.g., "every site matching `_broker\.place_order\(Order\(.*side=SELL`".
+4. **File-section heading (for docs):** e.g., "under the `## DEFs` heading in `CLAUDE.md`, after the row for DEF-216".
+
+Where line numbers are referenced (e.g., for cross-reference convenience or in error logs), they MUST be flagged as "directional only — verify via grep before editing" and the prompt MUST include a verbatim grep-verify command block.
+
+If the grep-verify reveals drift, the implementer MUST disclose under RULE-038 in the close-out and proceed against the actual structural anchors.
+
+This requirement applies to all impl prompts authored under `protocols/sprint-planning.md` v1.2.0+.
+
+### Anticipating mid-sprint doc-syncs
+
+Sprint planning should anticipate possible triggers for mid-sprint doc-syncs:
+
+- **Tier 3 review checkpoints** (per `escalation-criteria.md`'s A-class halts): Tier 3 verdicts often surface materializable items requiring mid-sync.
+- **Impromptu hotfixes** (per `protocols/impromptu-triage.md`): impromptus that change DEF-table state require a mid-sync to record the change in CLAUDE.md.
+- **Contradiction discoveries** (mid-sprint discovery that the spec is wrong or implementation reality has diverged): may require mid-sync amendments to sprint-spec, impl prompts, or escalation criteria.
+
+For each anticipated trigger, the sprint plan should note:
+- Which session(s) might emit the trigger.
+- What the mid-sync is expected to update (rough scope).
+- Whether DECs are likely to materialize at the mid-sync (Pattern A) or be deferred to sprint-close (Pattern B per `protocols/mid-sprint-doc-sync.md`).
+
+See `protocols/mid-sprint-doc-sync.md` for the full mid-sync protocol.
 
 ### Phase E: Verify
 

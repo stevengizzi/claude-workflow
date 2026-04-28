@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.3.0 -->
-<!-- last-updated: 2026-04-27 -->
+<!-- workflow-version: 1.4.0 -->
+<!-- last-updated: 2026-04-28 -->
 # Template: Work Journal Close-Out
 
 > **Autonomous runner mode:** The Work Journal (or its equivalent logs) produces
@@ -56,6 +56,23 @@ discipline in effect:
 - **Sessions:** {SESSION_LIST}
 - **Tests:** pytest {BEFORE_PYTEST} → {AFTER_PYTEST} (+{DELTA_PYTEST}), Vitest {BEFORE_VITEST} → {AFTER_VITEST} (+{DELTA_VITEST})
 - **Review verdicts:** {VERDICT_SUMMARY}
+
+### Acknowledging mid-sprint syncs
+
+When a sprint includes one or more mid-sprint doc-syncs (per `protocols/mid-sprint-doc-sync.md`), the sprint close-out narrative MUST acknowledge:
+
+1. Each mid-sync that fired (with date, trigger, and manifest path).
+2. The transitions claimed by each manifest's tables.
+3. The resolution status of each transition (applied / skipped / deferred-further).
+
+This narrative section accompanies the structured transitions applied by the doc-sync automation prompt; the close-out is the human-readable record, the manifest is the mechanical record.
+
+Example narrative shape:
+
+> ### Mid-sprint doc-syncs in this sprint
+>
+> - **Tier 3 #1 doc-sync** (date, manifest at `<path>`): N transitions claimed, all applied.
+> - **Pre-impromptu doc-sync** (date, manifest at `<path>`): N DEF transitions claimed + M DEC deferrals; all applied at sprint-close.
 
 ---
 

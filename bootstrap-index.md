@@ -1,3 +1,5 @@
+<!-- workflow-version: 1.0.0 -->
+<!-- last-updated: 2026-04-28 -->
 # Workflow Bootstrap Index
 
 > This file is the sole workflow reference in this Claude.ai project's knowledge.
@@ -84,6 +86,19 @@ Read during artifact generation (Phase C/D):
 ### Tier 3 Architectural Review
 - `protocols/tier-3-review.md`
 
+### Mid-Sprint Doc-Sync (Tier 3 Verdict / Impromptu Hotfix / Contradiction Discovery)
+Read first:
+- `protocols/mid-sprint-doc-sync.md`
+
+Read during artifact generation:
+- `templates/doc-sync-automation-prompt.md` (for the sprint-close consumer contract)
+- `templates/implementation-prompt.md` (if the mid-sync produces new impl prompts)
+- The triggering verdict/closeout artifact in the sprint folder.
+
+Output:
+- A `*-doc-sync-manifest.md` artifact in the sprint folder, per the protocol.
+- The actual file edits the sync was triggered to make (DEF rows, impl prompts, sprint-spec amendments, etc.).
+
 ### In-Flight Triage (Sprint Work Journal)
 - `protocols/in-flight-triage.md`
 - `templates/work-journal-closeout.md` (at sprint close, for generating the handoff)
@@ -133,6 +148,7 @@ Read during artifact generation (Phase C/D):
 | Run Log Spec | `protocols/run-log-specification.md` | Runner log format |
 | Spec Conformance | `protocols/spec-conformance-check.md` | Design-intent alignment check |
 | Tier 2.5 Triage | `protocols/tier-2.5-triage.md` | Automated issue triage |
+| Mid-Sprint Doc-Sync | `protocols/mid-sprint-doc-sync.md` | Coordinate doc-syncs that fire mid-sprint (Tier 3 verdicts, impromptu hotfixes, contradiction discoveries); produces manifest consumed by sprint-close |
 
 ## Template Index
 

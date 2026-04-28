@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.2.0 -->
-<!-- last-updated: 2026-04-27 -->
+<!-- workflow-version: 1.3.0 -->
+<!-- last-updated: 2026-04-28 -->
 # Protocol: In-Flight Triage
 
 **Context:** Claude.ai conversation (Sprint Work Journal)
@@ -120,6 +120,16 @@ Open a fresh Work Journal conversation only if:
 Fresh-conversation onboarding takes 1-2 turns: paste the original handoff
 prompt + the register artifact at its latest state + a brief continuation
 note (sessions complete, Tier 3 verdicts complete, what's next).
+
+### Relationship to mid-sprint doc-syncs
+
+Per-session register refreshes (this protocol) are bounded to a single session's close-out. When state changes span multiple sessions or affect cross-sprint artifacts (DEC entries, DEF rows in CLAUDE.md, sprint-spec amendments, new impl prompts), the change is a *mid-sprint doc-sync* governed by `protocols/mid-sprint-doc-sync.md` rather than this protocol.
+
+A useful heuristic:
+- **In-flight triage applies when:** the change is contained to one session's state (commits, register row updates, DEF status touched only inside the session's close-out).
+- **Mid-sprint doc-sync applies when:** the change affects state outside the session's natural scope (CLAUDE.md DEF table, decision-log.md, sprint-spec.md, multiple impl prompts, the work-journal-register's session order).
+
+Both protocols produce auditable artifacts; mid-sync produces a manifest, in-flight triage updates the work-journal-register inline.
 
 ## Issue Categories
 

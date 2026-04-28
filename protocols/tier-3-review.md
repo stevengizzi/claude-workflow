@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.1 -->
-<!-- last-updated: 2026-04-27 -->
+<!-- workflow-version: 1.0.2 -->
+<!-- last-updated: 2026-04-28 -->
 # Protocol: Tier 3 Architectural Review
 
 **Context:** Claude.ai conversation
@@ -92,3 +92,4 @@ The conversation should produce:
 7. **A stable repo verdict artifact** at `docs/sprints/<sprint-name>/tier-3-review-N-verdict.md` (where N is the review iteration within this sprint, starting at 1). This is the file that survives Claude.ai conversation rollover; without it, the verdict exists only in a transcript that may eventually be inaccessible. The verdict artifact should be condensed (~200-400 lines) and include: verdict, sessions reviewed with anchor commit, focus areas with caveats, additional concerns enumerated A through N, inherited follow-ups by sprint, any workflow protocol gaps surfaced. Cross-references to DEC/DEF/RSK entries written in this same review.
 8. If REVISE_PLAN: specific changes to the roadmap
 9. If PAUSE_AND_INVESTIGATE: what needs investigation and a proposed approach
+10. **If the verdict surfaces materializable items routed for in-sprint resolution:** the verdict's disposition triggers a mid-sprint doc-sync per `protocols/mid-sprint-doc-sync.md`. The mid-sync produces a `*-doc-sync-manifest.md` enumerating files touched + sprint-close transitions owed. DECs whose architectural narrative depends on subsequent sessions MUST defer to sprint-close (Pattern B). DECs whose architectural narrative is complete at the verdict moment MAY materialize at the verdict's mid-sync (Pattern A); use Pattern B when in doubt.
