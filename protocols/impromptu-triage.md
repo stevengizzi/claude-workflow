@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.2.0 -->
-<!-- last-updated: 2026-04-28 -->
+<!-- workflow-version: 1.3.0 -->
+<!-- last-updated: 2026-04-29 -->
 # Protocol: Impromptu Triage
 
 **Context:** Claude.ai conversation (brief) followed by Claude Code implementation
@@ -33,13 +33,53 @@ Help me scope this into a minimal implementation that can be properly tracked."
 
 ### 2. Reserve Numbering
 
-"What is the next available:
-- DEC number: [check current max]
-- RSK number: [check current max]
-- DEF number: [check current max]
-- Sprint sub-number: [e.g., if current sprint is 5, this becomes 5.5 or 5.75]"
+Verify high-water marks **live** before reasoning about numbering. Memory and prior handoff prompts drift — between handoff authoring and execution, planned-sprint doc-syncs can file new DEFs/DECs/RSKs that move the high-water mark. A handoff written Monday evening referencing "DEF-N is the latest" can be 5+ behind by Tuesday morning if a sprint sealed in between.
 
-Assign a sprint sub-number immediately. Never leave impromptu work unnumbered.
+Run these commands (or project-equivalents) at the start of every impromptu, before drafting any artifacts:
+
+```bash
+# DEF high-water — scans the canonical DEF table in CLAUDE.md (or project equivalent).
+# Adjust the table format regex if your project uses a different shape.
+grep -hE "^\| (~~)?DEF-[0-9]+" CLAUDE.md \
+  | sed -E 's/.*DEF-([0-9]+).*/\1/' \
+  | sort -n | tail -3
+# Expected: latest 3 DEF numbers, monotonically increasing.
+
+# DEC high-water — scans the index file.
+grep -hE "DEC-[0-9]+" docs/dec-index.md \
+  | sed -E 's/.*DEC-([0-9]+).*/\1/' \
+  | sort -n | tail -3
+# Expected: latest 3 DEC numbers. Watch for FREED entries (⊗ marker
+# in dec-index.md): a freed DEC number is reserved-but-not-consumed and
+# is NOT available for reuse.
+
+# RSK high-water — if the project tracks risks separately.
+grep -hE "RSK-[0-9]+" docs/risk-register.md 2>/dev/null \
+  | sed -E 's/.*RSK-([0-9]+).*/\1/' \
+  | sort -n | tail -3 \
+  || echo "No risk register at docs/risk-register.md — skip RSK."
+```
+
+Record the live high-water marks. Drafted artifacts use `(live high-water + 1)` as the next available number, and continue sequentially from there for additional new identifiers.
+
+State the next-available numbers explicitly in the impromptu kickoff:
+
+```text
+DEF high-water at session start: DEF-N (live grep, not memory).
+DEC high-water at session start: DEC-M (live grep; freed numbers excluded).
+RSK high-water at session start: RSK-K (or "no risk register").
+This impromptu's new identifiers: DEF-(N+1), DEF-(N+2), DEC-(M+1), …
+```
+
+Also assign the sprint sub-number immediately. Never leave impromptu work unnumbered. The sub-number convention is project-specific (ARGUS uses decimal sub-sprints — `31.5`, `31.75`, `31.85`, `31.91`, `31.915` — between major sprints `31` and `32`); follow the project's existing pattern.
+
+<!-- Origin: ARGUS Sprint 31.915 retrospective (2026-04-29). The original
+     disk-pressure investigation handoff specified DEF-225 as the high-water
+     mark; by the time the conversation ran ~24 hours later, Sprint 31.91's
+     D14 doc-sync had filed DEF-226 through DEF-230. The 5-DEF drift was
+     caught only during artifact authoring, after multiple rounds of
+     reasoning about numbering had already proceeded against the stale
+     value. Live grep at kickoff catches this in seconds. -->
 
 ### 3. Impact Assessment
 
