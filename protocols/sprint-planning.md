@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.2.0 -->
-<!-- last-updated: 2026-04-28 -->
+<!-- workflow-version: 1.3.0 -->
+<!-- last-updated: 2026-04-29 -->
 # Protocol: Sprint Planning
 
 **Context:** Claude.ai conversation(s)
@@ -178,6 +178,48 @@ During Phase A, work through:
      data model changes, new integrations)
    - Does this sprint need the Iterative Judgment Loop? (visual/UI work)
    - Should we run Synthetic Stakeholder simulation? (API or UX design)
+   - **Does any Tier 3 mandatory trigger fire?** (See `protocols/tier-3-review.md`
+     § "Mandatory Triggers" for the rubric. If any trigger fires, schedule a
+     mandatory mid-sprint Tier 3 in the session breakdown at the natural
+     architectural-closure milestone, BEFORE downstream validation sessions
+     begin.)
+
+9. **Falsifiable Assumption Inventory (mandatory when sprint touches safety-
+   load-bearing code).** For sprints that modify or extend safety-load-bearing
+   code paths (order execution, position management, broker abstraction,
+   reconciliation, exit management, risk gating, or any code path identified
+   as safety-critical in the project's CLAUDE.md key-learnings or equivalent
+   canonical document), enumerate every primitive-semantics assumption
+   load-bearing on the proposed mechanism. Pair each with a spike or test
+   that *falsifies* (not merely *measures*) the assumption.
+
+   See `templates/sprint-spec.md` § "Falsifiable Assumption Inventory" for
+   the table format and Status semantics.
+
+   The FAI is a Phase A artifact; it must be present in the design summary
+   handoff to Phase B, and reproduced verbatim in the sprint spec at Phase C.
+   Adversarial review (Phase C-1) has explicit checklist items that scrutinize
+   the FAI: every load-bearing primitive-semantics assumption listed; no
+   "measured-only" spikes that should be "falsified"; no "unverified" entries
+   without justification.
+
+   The FAI prevents two classes of failure: (a) unrecognized assumptions
+   silently encoded in the design (caught only by close inspection); (b)
+   spikes that measure rather than falsify — confirming a steady-state
+   measurement rather than testing the breaking conditions where the
+   assumption would fail.
+
+   For sprints that do NOT touch safety-load-bearing code, the FAI is
+   optional but encouraged. Skip explicitly with a one-line note in Phase B's
+   design summary: "FAI: not applicable; sprint does not touch safety-load-
+   bearing code paths."
+
+   <!-- Origin: ARGUS Sprint 31.92 Round 1 + Round 2 (2026-04-29). See
+        templates/sprint-spec.md § "Falsifiable Assumption Inventory" for
+        the full Origin context describing the asyncio yield-gap race
+        (Round 1) and ib_async cache freshness (Round 2) primitive-semantics
+        assumption misses. Two consecutive rounds of the same class of
+        error indicated the planning protocol had a structural gap. -->
 
 ### Phase B: Checkpoint
 
@@ -237,6 +279,16 @@ If adversarial review was warranted (Phase A, step 8):
    c. Update the Sprint Spec, Specification by Contradiction, Session Breakdown,
       Escalation Criteria, Regression Checklist, and Doc Update Checklist as needed.
    d. Produce a brief Revision Rationale document logging each decision.
+   e. **Apply the Substantive vs Structural decision rubric** (see
+      `protocols/adversarial-review.md` § Resolution). If any rubric trigger
+      fires, the dispositions are structural — return to Phase B for re-run.
+      Otherwise revisions may be applied directly.
+   f. **Run another adversarial review round** (Round N+1) on the revised
+      artifacts. Round N+1's bar is whether the revisions themselves
+      introduced new issues. Continue until Outcome A (Round CLEAR) is
+      reached, OR Outcome C (pattern-of-Criticals) triggers full Phase A
+      re-entry. See `protocols/adversarial-review.md` § Resolution for the
+      three-outcome state machine.
 4. Proceed to Phase D with the final (post-revision) spec-level artifacts.
 
 If adversarial review was NOT warranted: proceed directly to Phase D.
@@ -403,6 +455,14 @@ Before ending the conversation, verify:
       revisions; prompts were generated from post-revision specs
 - [ ] If adversarial review was warranted: input package was generated with
       relevant architecture sections extracted (developer pastes, not assembles)
+- [ ] If sprint touches safety-load-bearing code: Falsifiable Assumption
+      Inventory is present in design summary AND sprint spec; every load-bearing
+      primitive-semantics assumption is listed; every entry's Status is
+      "falsified" (or "unverified" with explicit written justification);
+      no entries are "measured-only"
+- [ ] If any Tier 3 mandatory trigger fires (per `protocols/tier-3-review.md`
+      § Mandatory Triggers): mandatory mid-sprint Tier 3 is scheduled in the
+      session breakdown at the natural architectural-closure milestone
 - [ ] Every session's Creates/Modifies/Integrates columns are filled in the
       Session Breakdown -- no module is created without a session that integrates it
 - [ ] If new config fields are added: YAML field names verified against Pydantic
