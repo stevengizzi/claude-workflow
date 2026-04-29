@@ -1,9 +1,9 @@
-<!-- workflow-version: 1.0.2 -->
-<!-- last-updated: 2026-04-28 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-04-29 -->
 # Protocol: Tier 3 Architectural Review
 
 **Context:** Claude.ai conversation
-**Frequency:** When triggered by Tier 2 escalation, sprint completion, or periodic cadence
+**Frequency:** When triggered by Tier 2 escalation, sprint completion, periodic cadence, or mandatory-trigger (mid-sprint)
 **Output:** Architectural assessment, DEC/DEF/RSK entries, action items for next sprint
 
 ---
@@ -14,9 +14,78 @@
 - Tier 2 review verdict is ESCALATE
 - A sprint has completed (all sessions done, all Tier 2 reviews done)
 - Periodic cadence (every 3-4 sprints) for project health
+- **Mandatory mid-sprint trigger fired during Phase A** (see Mandatory
+  Triggers section below)
 
 **Not needed when:**
 - Tier 2 verdict is CLEAR and the sprint is not yet complete -- proceed to next session
+
+## Mandatory Triggers (sprint planner schedules in Phase A)
+
+The triggers below are checked during Phase A of sprint planning (per
+`protocols/sprint-planning.md` step 8). When ANY trigger fires, the sprint
+planner schedules a mandatory mid-sprint Tier 3 review at the natural
+architectural-closure milestone (typically the close-out of the session that
+delivers the architectural commitment), BEFORE downstream validation sessions
+begin.
+
+1. **Safety-load-bearing file footprint.** Sprint touches >25% of any file
+   identified as safety-load-bearing in the project's CLAUDE.md key-learnings
+   or equivalent canonical document. (For ARGUS, the canonical safety-load-
+   bearing files include `argus/execution/order_manager.py`,
+   `argus/execution/broker.py`, `argus/core/risk_manager.py`, and the
+   reconciliation paths.)
+
+2. **Architectural-closure ambition.** Sprint claims architectural closure
+   of ≥3 layers in any single DEC entry (e.g., a 4-layer OCA defense, a
+   5-layer alert observability architecture). The mid-sprint Tier 3
+   cross-validates the layer composition before downstream validation
+   sessions lock the design in.
+
+3. **Recent empirical falsification.** Sprint follows within 2 sprints of
+   an empirical falsification of a prior architectural-closure DEC. The
+   pattern indicates the architectural-closure mechanism may have systemic
+   issues warranting heightened scrutiny.
+
+4. **Campaign-close absorption.** Sprint is part of a campaign-close that
+   absorbs ≥3 deferred items per `protocols/campaign-orchestration.md` §1.
+   Aggregation magnifies the risk of cross-item interactions.
+
+5. **Adversarial review N≥2.** Sprint reached Round 2 adversarial review per
+   `protocols/adversarial-review.md`. The pattern indicates the spec author
+   needed multiple revision passes; mid-sprint Tier 3 catches any disposition
+   residual before validation begins.
+
+6. **High disposition partial-accept ratio.** ≥3 dispositions across all
+   adversarial-review rounds were PARTIAL ACCEPT (different fix shape from
+   reviewer's proposal). High partial-accept ratios indicate sustained
+   divergence between reviewer-proposed and disposition-author-chosen fix
+   shapes; mid-sprint Tier 3 evaluates whether the chosen fixes compose
+   coherently.
+
+The mid-sprint Tier 3 reviewer is a fresh Claude.ai conversation. Inputs:
+the close-out artifact for the milestone session + the revised sprint
+package (all Phase C artifacts) + the design summary from Phase B + every
+revision-rationale.md from adversarial review rounds. Scope: cross-layer
+composition validation (if architectural-closure trigger fired), Falsifiable
+Assumption Inventory cross-check (if FAI trigger fired), plus any session-
+specific concerns the sprint planner flags.
+
+The verdict from a mandatory mid-sprint Tier 3 is binding: PROCEED authorizes
+downstream validation sessions; REVISE_PLAN halts validation pending the
+revised plan; PAUSE_AND_INVESTIGATE halts the sprint pending operator
+decision.
+
+<!-- Origin: ARGUS Sprint 31.92 (2026-04-29). Sprint 31.92 originally
+     scheduled zero Tier 3 reviews despite touching order_manager.py 6 times
+     and claiming 4-layer architectural closure for DEC-390. Multiple Round 2
+     findings (H-R2-1 structural fragility, H-R2-5 ceiling-vs-protective
+     conflict, H-R2-2 composite failure mode) would have been caught by a
+     mid-sprint Tier 3 at the natural S4a milestone before validation
+     sessions locked the design in. Round 2's adversarial reviewer
+     specifically called out the absence of mid-sprint Tier 3 as M-R2-5.
+     Trigger-driven scheduling replaces planner-judgment with auditable
+     criteria. -->
 
 ## Inputs
 
@@ -25,6 +94,9 @@ Gather before starting the conversation:
 2. All Tier 2 review reports from the sprint (or the escalated session)
 3. The Sprint Spec and Specification by Contradiction
 4. Current project-knowledge.md and architecture.md
+5. **For mandatory mid-sprint Tier 3:** every revision-rationale.md from
+   adversarial review rounds + the design summary from Phase B + the close-out
+   artifact for the milestone session that triggered the review.
 
 Do NOT provide raw transcripts. The structured reports are the review artifacts.
 
@@ -39,6 +111,21 @@ Tier 1 Close-Out(s): [paste]
 Tier 2 Review(s): [paste]
 
 Current architecture context: [paste relevant sections]"
+
+For mandatory mid-sprint Tier 3:
+
+"I need a mandatory mid-sprint Tier 3 architectural review. Trigger fired:
+[which trigger from the Mandatory Triggers list]. Here are the inputs:
+
+Sprint Spec: [paste]
+Design Summary: [paste]
+Adversarial Review revision-rationale(s): [paste]
+Milestone session close-out: [paste]
+
+Current architecture context: [paste relevant sections]
+
+Scope: [cross-layer composition validation / FAI cross-check / specific
+concerns flagged by sprint planner]."
 
 ### 2. If Triggered by ESCALATE
 
@@ -61,7 +148,26 @@ Evaluate:
 4. Has the codebase moved in a direction consistent with the architecture document?
 5. Were any decisions made during implementation that should be elevated to DECs?"
 
-### 4. Cross-Sprint Concerns
+### 4. Mid-Sprint Architectural-Closure Review (for mandatory mid-sprint trigger)
+
+"This sprint claims architectural closure across N layers in DEC-[X]. Validate:
+
+1. Does each layer's individual mechanism behave as the spec claims?
+2. Does the composition across layers behave as the spec claims when the
+   failure of one layer is supposed to be caught by another?
+3. Is there a cross-layer composition test in the regression checklist?
+   Does it actually exercise a path where one layer's failure is caught by
+   another?
+4. Are there cross-layer paths the spec doesn't enumerate that could defeat
+   multiple layers simultaneously?
+5. Does the Falsifiable Assumption Inventory include every primitive-semantics
+   assumption load-bearing on each layer? Are any 'measured-only'?
+
+If cross-layer paths are unenumerated or unfalsified: the architectural-
+closure DEC's claim is not yet structurally supported. ESCALATE to
+PAUSE_AND_INVESTIGATE."
+
+### 5. Cross-Sprint Concerns
 
 "Looking beyond this sprint:
 1. Does anything from this sprint affect upcoming sprint plans?
@@ -69,7 +175,7 @@ Evaluate:
 3. Should the roadmap be adjusted based on what we learned?
 4. Are any risks from the register materializing or becoming more likely?"
 
-### 5. Documentation Reconciliation
+### 6. Documentation Reconciliation
 
 "Based on this review:
 1. What decisions need to be logged? (DEC entries)
