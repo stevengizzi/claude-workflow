@@ -1,4 +1,4 @@
-<!-- workflow-version: 1.1.0 -->
+<!-- workflow-version: 1.2.0 -->
 <!-- last-updated: 2026-04-29 -->
 # Template: Sprint Spec
 
@@ -28,6 +28,34 @@ that is a signal to do more discovery before committing to the sprint.
        - [Criterion A]
        - [Criterion B]
 
+    ### Defense-in-Depth Cross-Layer Composition Tests (mandatory when DEC entries claim N≥3 layer defense)
+
+    When a sprint materializes a DEC entry that claims defense-in-depth across
+    N≥3 layers (e.g., a 4-layer OCA defense; a 5-layer alert observability
+    architecture), the regression checklist MUST include at least one test
+    that exercises a *cross-layer composition path* — a scenario where the
+    failure of one layer is supposed to be caught by another, asserting that
+    the catch happens.
+
+    Per-layer correctness tests are necessary but not sufficient. Cross-layer
+    tests are the only mechanism that catches composition failures pre-merge.
+    A DEC claiming defense-in-depth whose per-layer tests all pass but whose
+    cross-layer path is unexercised is fragile to empirical falsification —
+    a single production scenario that defeats multiple layers simultaneously
+    will pass through.
+
+    Cross-layer tests are typically slow, ugly, and span multiple modules.
+    That is the cost of catching composition failures structurally rather
+    than after merge.
+
+    <!-- Origin: ARGUS Sprint 31.91 DEC-386 empirical falsification
+         (2026-04-28). DEC-386 claimed 4-layer defense closing ~98% of
+         DEF-204's blast radius; all four layers' individual tests passed;
+         the Apr 28 paper session produced 60 NEW phantom shorts via a
+         cross-layer path that no single layer's test exercised. Cross-layer
+         composition testing is the structural defense against this class
+         of failure. -->
+
     ### Performance Benchmarks (if applicable)
     | Metric | Target | Measurement Method |
     |--------|--------|--------------------|
@@ -56,6 +84,112 @@ that is a signal to do more discovery before committing to the sprint.
 
     ## Relevant Risks
     - RSK-[N]: [brief description -- how it affects this sprint]
+
+    ### Severity Calibration Rubric for new RSK entries
+
+    When filing a new RSK as part of this sprint, calibrate severity using
+    the floors below. The disposition author may rate higher than the floor
+    but not lower without explicit reviewer sign-off.
+
+    - **MEDIUM-HIGH floor:** The mitigation depends on operator action that
+      has empirically failed within the last 10 sprints, OR a similar failure
+      mode has been empirically observed in the project within the last 5
+      sprints.
+    - **HIGH floor:** The mitigation depends on a sprint-bounded fix and the
+      bound exceeds 4 weeks (calendar) OR 3 sprints (whichever is longer).
+    - **CRITICAL floor:** The failure mode produces unrecoverable financial
+      loss or data loss within a single trading session OR a single execution
+      window.
+
+    Example: an RSK whose only mitigation is "operator runs daily-flatten
+    script manually" must be rated MEDIUM-HIGH (or higher) if there is
+    empirical precedent of the operator missing a run. Rating it LOW or
+    LOW-MEDIUM relies on the operator never failing — which is empirically
+    false in many production-track histories.
+
+    Severity calibration disputes are escalation triggers for adversarial
+    review. A disposition author rating an RSK below the floor without
+    explicit reviewer sign-off is a Round 2 finding shape.
+
+    <!-- Origin: ARGUS Sprint 31.92 Round 2 H-R2-3 (2026-04-29). RSK-
+         RECONSTRUCTED-POSITION-DEGRADATION was filed at LOW-MEDIUM despite
+         Apr 28 paper-session debrief proving operator daily-flatten can
+         fail (27 of 87 ORPHAN-SHORT detections from a missed run). The
+         reviewer correctly identified the under-rating; the disposition
+         author had calibrated by instinct rather than by empirical
+         precedent. The rubric makes the calibration auditable. -->
+
+    ## Falsifiable Assumption Inventory (mandatory when sprint touches safety-load-bearing code)
+
+    This section is mandatory when the sprint modifies or extends code paths
+    that are safety-load-bearing — order execution, position management,
+    broker abstraction, reconciliation, exit management, risk gating, or any
+    code path identified as safety-critical in the project's CLAUDE.md
+    key-learnings or equivalent canonical document. Optional but encouraged
+    otherwise.
+
+    A "primitive-semantics assumption" is a claim about runtime behavior of
+    an underlying primitive that the proposed mechanism's correctness depends
+    on. Examples:
+    - "asyncio's single-threaded event loop serializes concurrent X."
+    - "broker.get_positions() returns fresh state."
+    - "modifyOrder is deterministic at sub-50ms latency."
+    - "this regex catches every variant of the error string IBKR can produce."
+    - "this dict-clear fires on every code path that closes the position."
+
+    Each assumption load-bearing on the proposed mechanism must be paired
+    with a spike or test that *falsifies* (not merely *measures*) the
+    assumption under the conditions where the failure mode would manifest.
+    A spike that measures `modifyOrder` latency at 50ms p95 in steady state
+    does NOT falsify the deterministic-amend hypothesis — to falsify, the
+    spike must try to break the assumption (concurrent amends across
+    positions; amends during reconnect; amends with stale order IDs).
+
+    | # | Primitive-semantics assumption | Falsifying spike or test | Status |
+    |---|--------------------------------|--------------------------|--------|
+    | 1 | [statement of the assumption] | [spike or test that falsifies it] | falsified / measured-only / unverified |
+    | 2 | [statement] | [spike or test] | falsified / measured-only / unverified |
+
+    The "Status" column is load-bearing for the adversarial review:
+    - **falsified:** spike/test exists, was run, and produced results that
+      confirmed the assumption (i.e., attempted to break it and failed to).
+    - **measured-only:** spike/test exists and measures the primitive's
+      behavior but does not attempt to falsify under stress conditions.
+      ESCALATE during adversarial review — measure-only spikes are the
+      failure mode this section exists to prevent.
+    - **unverified:** assumption not yet tested. Spec-author MUST add a
+      falsifying spike to the session breakdown OR justify in writing why
+      the assumption cannot be falsified pre-merge (rare; subject to
+      explicit reviewer scrutiny; documented inline below the table).
+
+    The inventory is itself a falsifiable artifact. If a future adversarial
+    review finds an additional primitive-semantics assumption load-bearing
+    on the mechanism not in this list, the inventory has failed — and the
+    mechanism's adversarial-review verdict must be downgraded accordingly.
+
+    The inventory is generated in Phase A (sprint-planning protocol step 9),
+    handed off through Phase B's design summary, and reproduced verbatim in
+    Phase C's sprint spec. Adversarial review (Phase C-1) has explicit
+    checklist items that scrutinize the FAI: every load-bearing primitive-
+    semantics assumption listed; no "measured-only" spikes that should be
+    "falsified"; no "unverified" entries without justification.
+
+    <!-- Origin: ARGUS Sprint 31.92 Round 1 + Round 2 (2026-04-29). Round 1
+         caught the asyncio yield-gap race assumption (the concurrent-emits
+         race was thought to be impossible because asyncio is single-threaded;
+         in fact coroutines yield control during await, and a second
+         coroutine can run an entire ceiling-check-and-place sequence between
+         yield points). Round 2 caught the ib_async position cache freshness
+         assumption (broker.get_positions() was thought to return fresh
+         state; in fact ib_async's local cache is stale during the reconnect
+         window, returning pre-disconnect state until subscriptions complete).
+         Both were primitive-semantics assumptions whose violation silently
+         produced the symptom class the proposed fix claimed to address.
+         Both were caught only by close inspection, not by skim review.
+         Two consecutive rounds of the same class of error indicated the
+         planning protocol had a structural gap — the proposed mechanism's
+         correctness depended on primitive-semantics claims that were not
+         enumerated, let alone falsified. This section closes that gap. -->
 
     ## Hypothesis Prescription (if applicable)
 
