@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.3.0 -->
-<!-- last-updated: 2026-04-29 -->
+<!-- workflow-version: 1.4.0 -->
+<!-- last-updated: 2026-05-04 -->
 # Protocol: Sprint Planning
 
 **Context:** Claude.ai conversation(s)
@@ -159,8 +159,12 @@ During Phase A, work through:
       close-out requirement (referencing the close-out skill's structured
       appendix section).
 
-   d. Confirm the review prompt template includes the structured verdict
-      requirement (referencing the review skill's structured verdict section).
+   d. Confirm the implementation prompt template's §Tier 2 Review (Mandatory
+      — @reviewer Subagent) section includes the structured verdict requirement
+      (referencing the review skill's structured verdict section). The standalone
+      review-prompt template (`templates/review-prompt.md`) is HITL-fallback only
+      per its deprecation header; default Phase D produces only impl prompts and
+      the @reviewer subagent invocation lives inline in each impl prompt.
 
 6. **Config changes assessment** -- If this sprint adds or modifies config
    fields (YAML files + Pydantic models), explicitly list each new field and
@@ -304,7 +308,11 @@ With finalized spec-level artifacts in hand, generate prompts:
    - The Sprint-Level Escalation Criteria (embedded)
    - The Sprint-Level Regression Checklist (embedded)
 
-   This file is written once and referenced by all session review prompts.
+   This file is written once and referenced by the @reviewer subagent invocation
+   embedded in each session's implementation prompt (see
+   `templates/implementation-prompt.md` § Tier 2 Review (Mandatory — @reviewer
+   Subagent)). In HITL-fallback mode, standalone review prompts also reference
+   this file by path.
    Save as `review-context.md` in the sprint directory (see File Layout below).
 
 2. For each session:
@@ -328,21 +336,45 @@ With finalized spec-level artifacts in hand, generate prompts:
       - Final review: full suite with `-n auto`
       This reduces full suite runs from 3× per session to ~4 total per sprint.
 
-   b. **Tier 2 Review Prompt** (using templates/review-prompt.md) -- a
-      **small, session-specific file** named `sprint-{N}-{session_id}-review.md`
-      in the sprint directory (matching the runner's expected convention) that:
-      - Points Claude Code to the Review Context File by path
-        (e.g., "Read `sprint-22/review-context.md` for the Sprint Spec,
-        Spec by Contradiction, regression checklist, and escalation criteria.")
-      - Contains the Tier 1 Close-Out Report placeholder (only blank field)
-      - Contains the session-specific review scope (diff range, test command,
-        files that should not have been modified)
-      - Contains session-specific review focus items
+   b. **Tier 2 Review (inline @reviewer subagent invocation, not a standalone
+      prompt).** Default Phase D does NOT produce a standalone review-prompt
+      file. The implementation prompt's §Tier 2 Review (Mandatory — @reviewer
+      Subagent) section provides the reviewer invocation inline; the @reviewer
+      subagent runs in its own context window with read-only tool restrictions
+      (plus the one permitted write: the review report file), examines the diff,
+      and writes its review report to `docs/sprints/sprint-{N}/session-{M}-review.md`
+      within the same CLI invocation as the implementation session.
 
-   The developer's workflow for each review: paste the small session review
-   prompt into Claude Code, paste the Tier 1 Close-Out Report into the
-   placeholder. Claude Code reads the Review Context File itself. No other
-   assembly required.
+      Each impl prompt's §Tier 2 Review section embeds:
+      - The review-context-file path (e.g., `sprint-22/review-context.md`).
+      - The close-out report path (`docs/sprints/sprint-{N}/session-{M}-closeout.md`).
+      - The diff range (e.g., `git diff HEAD~1`).
+      - The test command (per DEC-328 tiering).
+      - The "files that should NOT have been modified" list.
+      - The session-specific review focus items.
+      - The Sprint-Level Regression Checklist (embedded).
+      - The Sprint-Level Escalation Criteria (embedded).
+
+      These are exactly the fields a standalone review prompt would have carried;
+      they are now encoded inside the impl prompt itself. The developer's
+      workflow: paste the impl prompt; the implementation session runs, writes
+      the close-out, then invokes @reviewer which produces the review report.
+      No separate review-prompt file required.
+
+      **HITL-fallback (optional, NOT default):** A standalone review prompt
+      MAY be generated for sprints that explicitly run review as its own CLI
+      invocation rather than as a subagent within the implementation session.
+      In that case use `templates/review-prompt.md` per its deprecation-header
+      guidance and produce `sprint-{N}-{session_id}-review.md` in the sprint
+      directory. Otherwise, omit standalone review-prompt generation from
+      Phase D entirely.
+
+      Empirical evidence base: Sprint 31.92 (six refresh sessions —
+      S2a-prompt-refresh + S2b-prompt-refresh + S3a/S3b combined refresh + S4
+      trifold + S5 trifold) consistently VESTIGIAL-marked standalone review
+      prompts; the impl prompt's inline §Tier 2 Review section was authoritative
+      across all execution paths. See `templates/review-prompt.md` deprecation
+      header for the cross-reference.
 
 3. **Work Journal Handoff Prompt** -- a self-contained document that the
    developer pastes into a fresh Claude.ai conversation to create the
@@ -441,11 +473,17 @@ Before ending the conversation, verify:
 - [ ] Every session prompt ends with close-out skill invocation
 - [ ] Every session prompt embeds the Sprint-Level Regression Checklist and
       Escalation Criteria directly (implementer does not have review context file)
-- [ ] Every session has a corresponding Tier 2 review prompt
+- [ ] Every session's impl prompt includes the §Tier 2 Review (Mandatory —
+      @reviewer Subagent) section providing the reviewer invocation inline
+      (default path; standalone review-prompt files are HITL-fallback only
+      per `templates/review-prompt.md` deprecation header)
 - [ ] Review Context File contains full Sprint Spec, Spec by Contradiction,
       regression checklist, and escalation criteria
-- [ ] Every review prompt references the Review Context File by path
-- [ ] Every review prompt's only placeholder is the Tier 1 Close-Out Report
+- [ ] Every impl prompt's §Tier 2 Review section references the Review Context
+      File by path (provided to the @reviewer subagent)
+- [ ] Every impl prompt's §Tier 2 Review section instructs the @reviewer to
+      read the close-out from `docs/sprints/sprint-{N}/session-{M}-closeout.md`
+      (no operator-filled placeholder; close-out is read from disk)
 - [ ] No session has a compaction risk score of 14 or above (must be split)
 - [ ] The regression checklist covers all critical invariants
 - [ ] The escalation criteria are specific and evaluable (not vague)
@@ -471,7 +509,10 @@ Before ending the conversation, verify:
 - [ ] Work journal handoff prompt is self-contained (no "paste X here" —
       all sprint context embedded)
 - [ ] Every implementation prompt includes structured close-out requirement
-- [ ] Every review prompt includes structured verdict requirement
+- [ ] Every impl prompt's §Tier 2 Review section includes the structured
+      verdict requirement (default path; standalone review prompts in
+      HITL-fallback mode also include the structured verdict requirement
+      per `templates/review-prompt.md`)
 - [ ] Parallelizable flags are set with justification for all `true` values
 - [ ] No session flagged as parallelizable also scores 14+ on compaction risk
 - [ ] If autonomous mode planned: runner config has been reviewed
@@ -508,8 +549,14 @@ A complete sprint package contains:
 
 **Prompt-level artifacts (Phase D -- generated after adversarial review):**
 10. Review Context File (single shared file)
-11. Implementation Prompts (one per session)
-12. Tier 2 Review Prompts (one per session, references Review Context File)
+11. Implementation Prompts (one per session) — each impl prompt embeds the
+    §Tier 2 Review (Mandatory — @reviewer Subagent) section providing the
+    reviewer invocation inline. Default Phase D produces NO standalone
+    review-prompt files; the @reviewer-subagent invocation is inline.
+12. Standalone Tier 2 Review Prompts (HITL-fallback only — see
+    `templates/review-prompt.md` deprecation header. Default execution
+    embeds @reviewer-subagent invocation inside each Implementation Prompt
+    and does NOT produce standalone review-prompt files.)
 13. Work Journal Handoff Prompt (for in-flight triage conversation)
 14. Runner Configuration (runner-config.yaml, if autonomous mode planned)
 
@@ -537,7 +584,7 @@ prompt file paths from the sprint directory name and session IDs in
 | Review Context | `review-context.md` | `review-context.md` |
 | Runner Config | `runner-config.yaml` | `runner-config.yaml` |
 | Implementation Prompt | `sprint-{N}-{session_id}-impl.md` | `sprint-24.5-session-1-impl.md` |
-| Review Prompt | `sprint-{N}-{session_id}-review.md` | `sprint-24.5-session-1-review.md` |
+| Review Prompt (HITL fallback only) | `sprint-{N}-{session_id}-review.md` | `sprint-24.5-session-1-review.md` |
 | Work Journal Handoff | `work-journal-handoff.md` | `work-journal-handoff.md` |
 
 **Critical:** The runner builds prompt paths as `{sprint_dir}/{sprint_name}-{session_id}-impl.md`

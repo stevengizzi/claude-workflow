@@ -1,5 +1,5 @@
 <!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-04-28 -->
+<!-- last-updated: 2026-05-04 -->
 # Workflow Bootstrap Index
 
 > This file is the sole workflow reference in this Claude.ai project's knowledge.
@@ -78,7 +78,6 @@ Read during artifact generation (Phase C/D):
 - `templates/design-summary.md`
 - `templates/spec-by-contradiction.md`
 - `templates/implementation-prompt.md`
-- `templates/review-prompt.md`
 
 ### Adversarial Review
 - `protocols/adversarial-review.md`
@@ -106,7 +105,6 @@ Output:
 ### Impromptu Triage (Unplanned Work)
 - `protocols/impromptu-triage.md`
 - `templates/implementation-prompt.md`
-- `templates/review-prompt.md`
 
 ### Campaign Orchestration / Absorption / Close
 - **Campaign Orchestration / Absorption / Close** — read `protocols/campaign-orchestration.md` for the full protocol covering campaign absorption (§1), supersession (§2), authoritative-record preservation (§3), cross-track close-out (§4), pre-execution gates (§5), naming conventions (§6), DEBUNKED status (§7), absorption-vs-sequential decision matrix (§8), and the two-session SPRINT-CLOSE option (§9). Also read `protocols/sprint-planning.md` for per-session planning within the campaign.
@@ -157,7 +155,7 @@ Output:
 | Sprint Spec | `templates/sprint-spec.md` | Sprint planning Phase C |
 | Design Summary | `templates/design-summary.md` | Sprint planning Phase B |
 | Implementation Prompt | `templates/implementation-prompt.md` | Sprint planning Phase D |
-| Review Prompt | `templates/review-prompt.md` | Sprint planning Phase D |
+| Review Prompt | `templates/review-prompt.md` | DEPRECATED — HITL fallback only — see template's deprecation header. Default Phase D produces only impl prompts; @reviewer subagent invocation is inline per `templates/implementation-prompt.md` §Tier 2 Review (Mandatory). |
 | Spec by Contradiction | `templates/spec-by-contradiction.md` | Sprint planning Phase C |
 | Decision Entry | `templates/decision-entry.md` | Any decision logging |
 | Fix Prompt | `templates/fix-prompt.md` | Runner auto-fix sessions |

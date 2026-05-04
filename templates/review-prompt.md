@@ -1,19 +1,36 @@
-<!-- workflow-version: 1.2.0 -->
-<!-- last-updated: 2026-04-26 -->
-# Template: Tier 2 Review Prompt
+<!-- workflow-version: 1.3.0 -->
+<!-- last-updated: 2026-05-04 -->
+# Template: Tier 2 Review Prompt (DEPRECATED for default Phase D — HITL fallback only)
 
-> **Primary path:** The @reviewer subagent is invoked at the end of the
-> implementation session (see implementation-prompt.md). This produces
-> the review report within the same CLI invocation.
+> **DEPRECATED for default sprint-planning workflows.** As of metarepo amendment
+> 2026-05-04 ratifying empirical evidence from Sprint 31.92 (six refresh sessions
+> consistently VESTIGIAL-marking standalone review prompts; impl prompt's inline
+> §Tier 2 Review section is authoritative across all execution paths):
 >
-> **This template is used when:**
-> - Running in human-in-the-loop mode with separate manual review sessions
-> - The @reviewer subagent invocation fails and a fallback is needed
-> - The runner is in legacy mode (pre-subagent integration)
+> **The default Phase D artifact is the implementation prompt only.** The @reviewer
+> subagent invocation in the impl prompt's §Tier 2 Review (Mandatory) section
+> produces the review report within the same CLI invocation. No standalone review
+> prompt is required for default execution.
 >
-> When generating sprint packages, always generate both the implementation
-> prompt (with @reviewer invocation) and this review prompt as a fallback.
-> The runner will use whichever path its configuration specifies.
+> **This template is preserved for these specific use cases:**
+> - Human-in-the-loop mode with separate manual review sessions (operator running
+>   review in a fresh CLI invocation rather than as a subagent within the
+>   implementation session).
+> - Adversarial-review or Tier 3 review patterns where review-as-its-own-session
+>   structurally requires its own framing prompt distinct from implementation.
+> - Retrospective review of a session that was already executed without inline
+>   reviewer (e.g., post-hoc audits).
+>
+> **Do NOT use this template:**
+> - As a Phase D artifact in default sprint planning. Phase D produces only the
+>   impl prompt; the impl prompt's §Tier 2 Review section provides the reviewer
+>   invocation.
+> - In refresh-session output. Refreshed impl prompts inherit the inline-reviewer
+>   pattern; standalone review prompts in refresh-session scope are VESTIGIAL.
+>
+> **Cross-reference:** Sprint 31.92 sprint-close manifest at
+> `docs/sprints/sprint-31.92-def-204-round-2/d14-doc-sync-manifest.md` (in the
+> ARGUS repo) documents the six-session empirical evidence base.
 
 This is a small, session-specific file. The shared context (Sprint Spec,
 Specification by Contradiction, regression checklist, escalation criteria) lives

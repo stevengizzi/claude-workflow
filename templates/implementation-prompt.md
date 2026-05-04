@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.5.0 -->
-<!-- last-updated: 2026-04-28 -->
+<!-- workflow-version: 1.6.0 -->
+<!-- last-updated: 2026-05-04 -->
 # Template: Implementation Prompt
 
 Fill in all bracketed sections. The structure of this prompt is designed to
@@ -62,6 +62,49 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
       - Projects using Vitest MUST have `testTimeout` and `hookTimeout` set
         in vitest.config.ts (recommended: 10_000ms). Without these, a single
         unmocked hook can freeze a worker process permanently.]
+
+    **Pre-Flight item — Structural-anchor grep-verify (mandatory when refreshing an existing impl prompt):**
+
+    If this impl prompt is being refreshed (i.e., authored AFTER any predecessor
+    commit on `main` touched the surfaces this prompt anchors against — including
+    file paths, function names, line-number ranges, instance attributes, dict
+    declarations, config fields, or any count-based assertion such as "N use
+    sites" / "N grep hits" / "N effective parametrize cases"), the refresh author
+    MUST grep-verify ALL count-based pre-flight gates against current HEAD before
+    encoding them in the refreshed prompt.
+
+    This requirement does not apply to initial authoring (when the impl prompt is
+    created at Phase D before any sessions execute) — in that scenario, the impl
+    prompt's anchors are establishing the surface, not validating it against an
+    already-shipped surface.
+
+    The requirement DOES apply to:
+    - Refreshing an impl prompt after a predecessor session shipped a behavior-
+      altering commit that touched the prompt's anchor surfaces.
+    - Combined trifold refreshes where multiple predecessor sessions have shipped
+      intervening commits.
+    - Mid-sprint impl-prompt amendments after a Tier 3 verdict or scheduled mid-
+      sprint architectural-closure review (M-class verdict).
+
+    Cross-reference: Sprint 31.92 M-R2-5 mid-sprint Tier 3 verdict at
+    `docs/sprints/sprint-31.92-def-204-round-2/m-r2-5-mid-sprint-tier-3-verdict.md`
+    (ARGUS repo) — process-evolution observation #31 (refresh-prompt grep-verify
+    discipline lesson). The S4 trifold refresh at ARGUS commit `19b4c40` was
+    authored after S2a/S2b shipped Mechanism A migrations (removing 2 of 4
+    `_OCA_TYPE_BRACKET` use sites) but its count-based gates were not grep-updated;
+    M-R2-5 surfaced the resulting drift across 4 canonical artifacts requiring
+    mid-sync correction. The lesson is structural: any count-based assertion
+    encoded into a refreshed prompt without grep-verification at HEAD is a
+    structural anchor that has lost its anchoring.
+
+    The grep-verify pattern:
+    1. For each count-based assertion in the refreshed prompt ("N use sites" /
+       "N effective parametrize cases" / etc.), identify the underlying production
+       surface (file path + identifier).
+    2. Run `grep -c <pattern> <file>` at HEAD before encoding the count.
+    3. Use the actual HEAD count, not the predecessor's snapshot.
+    4. If multiple anchor surfaces are affected, run grep against all and verify
+       each independently.
 
     ## Objective
     [1-2 sentences: what this session accomplishes]
