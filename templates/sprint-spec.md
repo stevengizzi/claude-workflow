@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.2.0 -->
-<!-- last-updated: 2026-04-29 -->
+<!-- workflow-version: 1.3.0 -->
+<!-- last-updated: 2026-05-10 -->
 # Template: Sprint Spec
 
 Fill in all sections. Leave nothing as TBD -- if something is genuinely unknown,
@@ -48,6 +48,12 @@ that is a signal to do more discovery before committing to the sprint.
     That is the cost of catching composition failures structurally rather
     than after merge.
 
+    **Cross-references:** See `protocols/sprint-planning.md` § "Cross-layer
+    test scope-shaping (canonical per Sprint 31.92 F.7)" for the canonical
+    CL-N deferral rationale (when cross-layer test surface exceeds sprint
+    bandwidth, deferral is acceptable if the next sprint absorbs the
+    deferred test).
+
     <!-- Origin: ARGUS Sprint 31.91 DEC-386 empirical falsification
          (2026-04-28). DEC-386 claimed 4-layer defense closing ~98% of
          DEF-204's blast radius; all four layers' individual tests passed;
@@ -55,6 +61,32 @@ that is a signal to do more discovery before committing to the sprint.
          cross-layer path that no single layer's test exercised. Cross-layer
          composition testing is the structural defense against this class
          of failure. -->
+
+    ### Test Pattern Taxonomy (canonical per Sprint 31.92.6)
+
+    The following test patterns are canonical across sprint work. Reference by
+    name in sprint-spec impl-prompt sections:
+
+    | Pattern | Description | Canonical example |
+    |---|---|---|
+    | **Pattern A** (canonical match-target) | Test asserts production code's literal canonical string | Sprint 31.92.6 Phase 1 alert-emit-site tests |
+    | **Pattern B** (canonical match-target with NO-AMENDMENT) | Test asserts unchanged-from-baseline canonical string | Sprint 31.92.6 Phase 3 amendment cohort wave-1 |
+    | **Pattern C** (registry-dispatch unit-test) | Test asserts registry-routed dispatch invokes expected handler | Sprint 31.92.6 Phase 2 internal cancel registry |
+    | **Pattern D** (defense-in-depth corruption guard FIRST per-position check) | Test asserts corruption guard fires before downstream logic | Sprint 31.92.6 S3a-prime Branch 4 |
+    | **Pattern X** (integration-cohort cancel-emitting-function lock) | Test asserts each cancel-emitting function registers via canonical primitive | Sprint 31.92.6 Phase 3 integration cohort S3c-1/S3c-2 |
+    | **Pattern Y** (registry-dispatch path traversal) | Test asserts all valid dispatch paths produce expected outcomes | Sprint 31.92.6 Phase 3 integration cohort |
+    | **Pattern Z** (config-validation Pydantic field-validator tests) | Test asserts config field validator rejects invalid values | Sprint 31.92.6 S4a-2 + S4b-2 |
+    | **Pattern W** (multi-position interaction; per-position lock isolation) | Test asserts N-position interaction preserves per-position lock isolation | Sprint 31.92.6 S4c |
+    | **AST-retarget** | Test asserts AST guard catches the configured pattern | Sprint 31.92.6 Phase 3 amendment cohort |
+
+    When authoring impl prompts, reference patterns by name + cite the canonical
+    example. Operator can add new patterns as sprints surface them.
+
+    <!-- Origin: ARGUS Sprint 31.92.6 (2026-05-10). Pattern taxonomy
+         formalized across S3c-1/S3c-2 (Patterns X + Y integration cohort),
+         S4a-2 + S4b-2 (Pattern Z config-validation), S4c (Pattern W
+         multi-position interaction). See ARGUS docs/sprints/sprint-31.92.6/
+         work-journal-register.md for the canonical example attributions. -->
 
     ### Performance Benchmarks (if applicable)
     | Metric | Target | Measurement Method |
@@ -110,6 +142,12 @@ that is a signal to do more discovery before committing to the sprint.
     Severity calibration disputes are escalation triggers for adversarial
     review. A disposition author rating an RSK below the floor without
     explicit reviewer sign-off is a Round 2 finding shape.
+
+    **Cross-references:** See § "Test Pattern Taxonomy (canonical per Sprint
+    31.92.6)" above for test-pattern naming during Phase C session
+    decomposition. Severity calibration applies to RSK entries; the Pattern
+    Taxonomy applies to test-shape selection — both are Phase C authoring
+    disciplines.
 
     <!-- Origin: ARGUS Sprint 31.92 Round 2 H-R2-3 (2026-04-29). RSK-
          RECONSTRUCTED-POSITION-DEGRADATION was filed at LOW-MEDIUM despite

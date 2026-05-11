@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.4.0 -->
-<!-- last-updated: 2026-05-04 -->
+<!-- workflow-version: 1.5.0 -->
+<!-- last-updated: 2026-05-10 -->
 # Protocol: Sprint Planning
 
 **Context:** Claude.ai conversation(s)
@@ -225,6 +225,40 @@ During Phase A, work through:
         assumption misses. Two consecutive rounds of the same class of
         error indicated the planning protocol had a structural gap. -->
 
+### B1 cap re-baseline methodology (canonical per Sprint 31.92.6)
+
+The Phase A cap-setting estimate (cumulative pytest delta ceiling) is an
+initial planning artifact and may require **forecast-driven re-baseline**
+during the sprint if Phase D scope expansion materially exceeds the
+Phase A baseline assumption.
+
+**Re-baseline discipline:**
+
+1. **Single re-baseline per sprint maximum.** Repeat re-baselines feel like
+   moving goalposts and erode the cap's planning utility.
+2. **Re-baseline at LITE refresh boundary**, not mid-session, so the
+   adjustment lands in the work-journal-register's headroom prose.
+3. **Forecast-driven re-baselines** are acceptable when Phase D scope
+   expansion is empirically driven (e.g., Tier 3 dispositions adding
+   sub-sessions + cross-layer composition expansion). Document the
+   Phase A → Phase D scope delta as rationale.
+4. **Structural-work-driven final overage** (beyond re-baselined cap) is
+   acceptable when the overage corresponds to canonical compliance work
+   (e.g., AC parametrize-full sweep) NOT test bloat. Document as one-shot
+   adjustment sequence in sprint-close CLAUDE.md sprint-health note.
+
+**Phase A cap-setting takeaway (Sprint 31.92.6 observation):** account for
+cross-layer composition expansion + AC compliance sweep + Phase D scope
+flexibility margin (~+50 to +75 above naive sub-session-count ×
+per-session-test-budget estimate). Sprint 31.92.6's actual progression:
+Phase A +250 → re-baseline +300 at S5a-2 → final +332 (+32 structural-
+work-driven overage at S5b).
+
+<!-- Origin: ARGUS Sprint 31.92.6 (2026-05-10). See ARGUS
+     docs/process-evolution.md § F.24 for the canonical narrative;
+     CLAUDE.md sprint-health note records the +332 one-shot overage
+     disposition. -->
+
 ### Phase B: Checkpoint
 
 Before generating any artifacts:
@@ -270,6 +304,58 @@ If compaction occurs mid-generation:
 3. List which artifacts are already saved
 4. Continue from where generation stopped
 
+### Mechanical pairwise file-overlap matrix (Phase C artifact per F.21, canonical per Sprint 31.92.5)
+
+For sprints with parallel-marked sessions, author a mechanical pairwise
+file-overlap matrix as a Phase C artifact at
+`docs/sprints/sprint-<N>/wave-parallelization-audit.md`:
+
+| Session | Files modified | Overlap with siblings? |
+|---|---|---|
+| Sxa | argus/execution/foo.py + tests/execution/test_foo.py | None |
+| Sxb | argus/execution/bar.py + tests/execution/test_bar.py | None |
+| Sxc | argus/core/baz.py + tests/core/test_baz.py | None |
+
+Pairwise overlap analysis: for every (Si, Sj) pair where both are
+Parallelizable: True, verify file sets are disjoint. If overlap exists,
+sequentialize or rescope.
+
+DEC-399 (Sprint 31.92.5) is the canonical adoption of this pattern as a
+process decision.
+
+### FAI completeness with multi-tier defense in depth (canonical per Sprint 31.92)
+
+When authoring FAI (Falsifiable Assumption Inventory), include multi-tier
+defense-in-depth coverage:
+
+1. **Primary tier**: the assumption itself (canonical detection mechanism)
+2. **Secondary tier**: detection failure mode (what if primary detection
+   fails)
+3. **Tertiary tier**: defense-in-depth refusal (what if secondary detection
+   fails)
+
+Sprint 31.92's L1 Mechanism A binary gate + L2 detection-and-suppression +
+L3 SELL-volume ceiling with reconstructed-position refusal is the canonical
+example: each layer carries an independent assumption + falsification path.
+
+FAI items that cover only primary detection without secondary/tertiary
+fallback are incomplete; surface as Phase E REVISE_PLAN trigger.
+
+### Cross-layer test scope-shaping (canonical per Sprint 31.92 F.7)
+
+When sprint scope includes cross-layer composition tests, the test surface
+may exceed sprint bandwidth. CL-N deferral rationale (e.g., Sprint 31.92's
+CL-6 deferral) is acceptable when:
+
+1. The deferred cross-layer test verifies a layer-N+M composition that
+   sub-rest of the sprint structurally covers via independent layer tests
+2. The deferred test is enumerated in the sprint-spec with explicit
+   "deferred to <successor-sprint>" rationale
+3. The next sprint absorbs the deferred test as part of its sprint-spec
+
+CL-N deferrals should NOT exceed 2 per sprint; if 3+ cross-layer tests
+defer, the sprint scope itself needs Phase A re-evaluation.
+
 ### Phase C-1: Adversarial Review Gate
 
 If adversarial review was warranted (Phase A, step 8):
@@ -296,6 +382,22 @@ If adversarial review was warranted (Phase A, step 8):
 4. Proceed to Phase D with the final (post-revision) spec-level artifacts.
 
 If adversarial review was NOT warranted: proceed directly to Phase D.
+
+### Operator-override with proportional in-sprint mitigation (canonical per Sprint 31.92 F.8)
+
+When adversarial review surfaces borderline-class concerns (Round 3 C-R3-1
+style), operator may override with proportional in-sprint mitigation rather
+than full revision. The override is documented in Phase C's adversarial-
+review-rationale artifact with:
+
+1. The concern class (HIGH / MEDIUM / LOW / borderline)
+2. The mitigation shape (e.g., add canary test + watchdog + cross-layer
+   composition test instead of full impl re-architecture)
+3. Why the proportional mitigation suffices (structural reasoning)
+4. The acceptance gate (typically Tier 3 review of the mitigation outcome)
+
+The override is the operator's signal to the reviewer that the concern was
+considered; it is NOT a Tier 2-bypass mechanism.
 
 ### Phase D: Generate Prompts
 
@@ -425,6 +527,46 @@ For each anticipated trigger, the sprint plan should note:
 
 See `protocols/mid-sprint-doc-sync.md` for the full mid-sync protocol.
 
+### Phase-D-time spec-vs-implementation framing reconciliation
+
+When Phase D generates impl prompts that reference Phase B/C sprint-spec
+narrative, verify the sprint-spec framing matches the actual implementation
+shape that Phase D produces. Sprint 31.92.6 Tier 3 #2 surfaced two framing
+divergences caught only at S5b's AC validation suite execution:
+
+1. **Mode-of-acceptance divergence**: spec narrative may carry a previously-
+   ratified adversarial-review proposal (e.g., M-9 SUPERSEDES) while impl
+   prompts honor a later operator disposition (e.g., R9 PARTIAL ACCEPT). The
+   spec narrative and implementation should reconcile at Phase D, not at
+   sprint-close.
+
+2. **Deliverable-label repurposing**: spec deliverable labels (e.g., "Del. H'")
+   may be repurposed in impl prompts for different content than the spec
+   defines (Sprint 31.92.6 "Del. H'" → spec's Del. L watchdog work).
+   Repurposings should be reconciled at Phase D OR at sprint-close per
+   path (a)-style reframe.
+
+**Phase-D-time check (recommended):** for each impl prompt, grep the spec
+for the deliverable label and confirm the impl scope matches. Where
+divergences exist, document inline in the impl prompt's "Mode of acceptance"
+or "Deliverable mapping" section. If reconciliation cannot land at Phase D,
+file the divergence as a Tier 3 input artifact for mid-sprint review.
+
+### Sibling-parallel git-diff verification (canonical per Sprint 31.92.5)
+
+For Phase D sessions marked Parallelizable: True (relative to siblings), the
+mechanical pairwise file-overlap matrix (Phase C artifact per F.21) defines
+disjoint file scopes. At session close, verify:
+
+```bash
+git diff --name-only <predecessor-anchor>..<session-commit>
+# Output must NOT overlap with sibling-session diffs
+```
+
+When parallel sessions both modify a shared file (e.g., docs/sprint-history.md
+sprint append entries), the sibling-parallel discipline is broken; convert
+to sequential execution OR rescope.
+
 ### Phase E: Verify
 
 After all artifacts are generated:
@@ -498,6 +640,12 @@ Before ending the conversation, verify:
       primitive-semantics assumption is listed; every entry's Status is
       "falsified" (or "unverified" with explicit written justification);
       no entries are "measured-only"
+- [ ] **F.5 structural closure framing**: Phase E verdict language must frame
+      closure structurally (e.g., "Mechanism A landed; AC1.4 invariance holds;
+      6 cross-layer composition tests preserve binary-gate semantics") rather
+      than aggregate percentage claims (e.g., "85% of ACs are met"). Aggregate
+      claims obscure binary-gate semantics; structural claims preserve them.
+      Canonical per Sprint 31.92's structural closure verdict.
 - [ ] If any Tier 3 mandatory trigger fires (per `protocols/tier-3-review.md`
       § Mandatory Triggers): mandatory mid-sprint Tier 3 is scheduled in the
       session breakdown at the natural architectural-closure milestone
