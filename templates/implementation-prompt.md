@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.6.0 -->
-<!-- last-updated: 2026-05-04 -->
+<!-- workflow-version: 1.7.0 -->
+<!-- last-updated: 2026-05-10 -->
 # Template: Implementation Prompt
 
 Fill in all bracketed sections. The structure of this prompt is designed to
@@ -106,6 +106,17 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     4. If multiple anchor surfaces are affected, run grep against all and verify
        each independently.
 
+    **Pre-Flight item — Self-Anchoring Pre-Flight (canonical from Sprint 31.92):**
+
+    Every implementation prompt produced via Phase D direct-paste execution
+    should include explicit anchor-capture in pre-flight: `git rev-parse HEAD`
+    to capture the SHA the session will operate against. Document the captured
+    SHA in the session's close-out for traceability. Validated through 7
+    direct-paste execution sessions in Sprint 31.92; recommended as default
+    methodology. Sibling-adjacent to F.10 sibling-parallel verification (Sprint
+    31.92.5 retrospective candidate) — both patterns codify "encode the
+    starting state explicitly so deviations from it are auditable."
+
     ## Objective
     [1-2 sentences: what this session accomplishes]
 
@@ -154,6 +165,39 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
       of other session prompts. Even sessions with clear coupling handle the
       coupling via prose instructions referencing the state of `main`, not via
       cross-prompt references. (Origin: synthesis-2026-04-26 ID3.1.)
+
+    ### POLICY_TABLE precedent class (canonical from Sprint 31.92.6)
+
+    When an implementation prompt's § Constraints prohibits POLICY_TABLE
+    additions but the impl path requires emitting a new alert constant
+    (AST-guard-driven), a minimum-viable PolicyEntry shell (alert_type →
+    PolicyEntry with no auto-resolution policy) is **permitted as
+    MINOR_DEVIATIONS**. Self-assess as MINOR_DEVIATIONS in the close-out; no
+    operator-action required mid-session. This is the canonical precedent
+    class per Sprint 31.92.6's 3 same-class additions at S3a-prime + S3b +
+    S4b-1.
+
+    DEF-284 (Sprint 31.92.6) is the counter-example: when adding the alert
+    constant would BREAK an AST-guard test (vs. the test simply requiring the
+    addition), the architectural-lock disposition applies — file a DEF, route
+    the materialization to the next sprint's dual-fix scope, and self-assess
+    as MINOR_DEVIATIONS with explicit disclosure.
+
+    ### Concurrency-sensitive session discipline (when applicable)
+
+    For sessions touching concurrency-sensitive code (per-position locks,
+    async gather paths, callback ordering): document the cross-session
+    preservation chain in close-out. The Sprint 31.92.6 A8 lock preservation
+    pattern: write-side under per-position lock + cleanup under same lock +
+    read-side discipline + concurrent-transition tests under `asyncio.gather`
+    confirming DISTINCT lock instances via identity-based `is not`
+    verification.
+
+    Implicit preservation across multiple sessions is fine if at least one
+    session explicitly verifies via discrimination. The A8 preservation chain
+    is the canonical exemplar — an "is not" identity check, run under
+    `asyncio.gather`, falsifies the silent-shared-lock failure mode that a
+    pure equality check would not.
 
     ## Operator Choice (if applicable)
 
@@ -300,6 +344,81 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
 
     Do NOT just print the report in the terminal. Create the file, write the
     full report (including the structured JSON appendix) to it, and commit it.
+
+    ### Self-Assessment categories (canonical per RULE-011)
+
+    Four categories canonical as of Sprint 31.92.6:
+
+    1. **STRICT_ADHERENCE** — implementation matches impl-prompt intent
+       exactly; zero deviations.
+
+    2. **MINOR_DEVIATIONS** — local non-semantic deviations exist (e.g.,
+       RULE-038-driven canonical-reality alignments where impl-prompt naming
+       diverged from grep-verified production reality, OR test-infrastructure
+       adaptations within session scope). Document each deviation in
+       close-out.
+
+    3. **FLAGGED** — implementation surfaces a structural-class issue
+       requiring operator-level decision (path a/b/c style) BUT does not
+       overstep into next-session-or-sprint territory. Reserved for
+       sprint-boundary scope-reframe disclosure. The implementer is
+       signaling "I executed the literal contract; here is an in-sprint
+       planning reframe the operator needs to disposition." Canonical
+       example: Sprint 31.92.6 S5b's 24-AC reframe surfaced at AC validation
+       suite execution. Tier 2 reviewers should accept FLAGGED
+       self-assessment when (a) the literal contract IS met, (b) the
+       surfaced issue is structural (not within-session-fixable), (c)
+       operator paths are enumerated, and (d) the implementer hasn't
+       unilaterally fixed the reframe.
+
+    4. **HALT** — implementation cannot proceed without operator
+       intervention (rare; reserved for blocking issues mid-session).
+
+    The combination of self-assessment + Tier 2 verdict surfaces additional
+    discriminator semantics — see `templates/review-prompt.md` § Verdict
+    Combinations for the full taxonomy.
+
+    ### F3 disposition flexibility (canonical from Sprint 31.92.6)
+
+    Spike-results / operator-tooling artifact drift (canonically:
+    `scripts/spike-results/*.json` rebaselines) can be either chore-isolate
+    (separate commit AFTER session work) OR fold-into-feature (same commit
+    as impl work) depending on context:
+
+    - **Chore-isolate** when the drift is operator-tooling artifact
+      unrelated to the session's scope ("clean session archaeology"
+      preference). Default recommendation per Sprint 31.92.6 dominance
+      (58%).
+    - **Fold-into-feature** when the drift is integral to OR
+      same-session-scope as the session's work (e.g., AC validation work
+      that touches the composite anyway).
+    - **Fold-into-correction-commit** when the drift surfaces during a
+      post-review correction commit (Sprint 31.92.6 S4d precedent).
+
+    In all three dispositions (chore-isolate, fold-into-feature, and
+    fold-into-correction-commit), document the choice + rationale in
+    close-out. The disposition is NOT categorical; either is acceptable
+    when context-justified.
+
+    ### Commit + Push (canonical)
+
+    After session work + verification:
+
+    1. Stage modified files: `git add <files>`
+    2. Verify staging: `git status --short` (should show only intended files)
+    3. Commit with full-message-body shape (see template in close-out
+       section)
+    4. **Push immediately**: `git push origin main`
+    5. **Verify push parity**: `git log --oneline origin/main..HEAD` (must be
+       empty before declaring DONE)
+    6. **Optional**: `git fetch origin --tags` if the session published tags
+
+    Push verification is **mandatory** — declaring a session DONE without
+    empty `origin/main..HEAD` violates the close-out contract. When
+    self-assessment is FLAGGED, the commit message body MUST explicitly
+    call out the FLAGGED disposition + enumerated operator paths so the
+    push lands a self-describing artifact (not a quiet commit hiding the
+    reframe).
 
     ## Tier 2 Review (Mandatory — @reviewer Subagent)
     After the close-out is written to file and committed, invoke the @reviewer

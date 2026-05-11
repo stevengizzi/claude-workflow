@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.3.0 -->
-<!-- last-updated: 2026-05-04 -->
+<!-- workflow-version: 1.4.0 -->
+<!-- last-updated: 2026-05-10 -->
 # Template: Tier 2 Review Prompt (DEPRECATED for default Phase D — HITL fallback only)
 
 > **DEPRECATED for default sprint-planning workflows.** As of metarepo amendment
@@ -127,3 +127,57 @@ in the Review Context File and is referenced by path -- not duplicated here.
     [Any session-specific context the reviewer needs -- e.g., "This is attempt 2
     at fixing the auth bug, check if diagnostic-first was followed" or "This
     session follows Session 1 which set up the data model"]
+
+    ## Verdict Combinations (canonical per Sprint 31.92.6)
+
+    The combination of implementer Self-Assessment + Tier 2 Verdict surfaces
+    discriminator semantics. Four canonical combinations observed:
+
+    1. **STRICT_ADHERENCE / CLEAR** — implementation matches intent exactly;
+       no deviations; clean review.
+
+    2. **MINOR_DEVIATIONS / CLEAR** — local non-semantic deviations exist
+       (RULE-038-driven canonical-reality alignments OR test-infrastructure
+       adaptations). Reviewer accepts when deviations have no impact on
+       impl-prompt intent. Canonical examples: Sprint 31.92.6 S5a-1, S5a-2.
+
+    3. **MINOR_DEVIATIONS / CLEAR-WITH-NOTES** — deviations carry
+       impl-prompt-intent impact OR architectural-lock-class issues.
+       Reviewer adds NOTES to flag downstream concerns without escalating
+       to CONCERNS. Canonical examples: Sprint 31.92.6 S3b, S4b-1, S5c.
+
+    4. **FLAGGED / CLEAR** — implementer surfaces sprint-boundary
+       scope-reframe disclosure; literal contract met; structural-class
+       issue routed to operator-level path decision. Reviewer confirms
+       CLEAR when the FLAGGED disposition is honest, well-scoped, and
+       doesn't unilaterally fix the reframe. Canonical example: Sprint
+       31.92.6 S5b ("exemplary FLAGGED usage per Universal RULE-011").
+
+    **Discriminator** (per Sprint 31.92.6 S5a-2 reviewer reasoning):
+    MINOR_DEVIATIONS escalates to CLEAR-WITH-NOTES when deviations carry
+    impl-prompt-intent impact; stays at CLEAR when deviations are
+    RULE-038-driven canonical-reality alignments.
+
+    **Escalation classes** (used sparingly):
+    - CONCERNS — deviations require pre-merge fix; not a sprint failure
+    - CONCERNS_RESOLVED — issued post-fix verification
+    - ESCALATE — A-class trigger fired; requires Tier 3 or operator review
+    - HALT — implementation cannot proceed
+
+    ### Accepting FLAGGED self-assessment
+
+    When the implementer self-assesses as FLAGGED, the reviewer verifies:
+
+    1. **Literal contract met** — impl-prompt's Definition-of-Done is
+       satisfied
+    2. **Structural-class issue** — surfaced issue is NOT
+       within-session-fixable
+    3. **Operator paths enumerated** — implementer provides path a/b/c
+       options
+    4. **No unilateral fix** — implementer hasn't attempted to reshape the
+       reframe themselves
+
+    When all 4 are met, Tier 2 verdict is **CLEAR** (not CLEAR-WITH-NOTES;
+    not CONCERNS). The FLAGGED disclosure is the operator's signal, not a
+    reviewer concern. Document in verdict rationale that this is exemplary
+    RULE-011 usage.
