@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-05-04 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-05-10 -->
 # Workflow Bootstrap Index
 
 > This file is the sole workflow reference in this Claude.ai project's knowledge.
@@ -188,6 +188,37 @@ When reading a protocol, note the version header if present:
 If mid-sprint and a protocol has changed since the sprint started, note the
 version difference but continue with the version used at planning time.
 Adopt the new version for the next sprint.
+
+---
+
+## Recent Synthesis Sprints
+
+**synthesis-sprint-31.92.6 — completed 2026-05-10**
+
+Metarepo synthesis sprint absorbing Sprint 31.92 + 31.92.5 + 31.92.6
+RETRO-FOLD lessons. 5 sessions: D1 templates / D2 sprint-planning +
+sprint-spec / D3 review protocols / D4 in-flight + ARGUS universal RULEs
+/ D5 bookkeeping closure. 8 metarepo files amended + 2 new ARGUS RULEs
+(RULE-054 FLAGGED canonical + RULE-055 MD5 byte-equality discrimination)
++ 1 new evolution-notes file. Cumulative lessons folded:
+
+- Sprint 31.92.6 (NEW): FLAGGED canonical + B1 cap methodology +
+  path-(a) reframe pattern + Pattern X/Y/Z/W taxonomy + MD5 byte-equality
+  discrimination + POLICY_TABLE precedent class + F3 disposition
+  flexibility + 4 verdict-self-assessment combinations + Phase-D-time
+  spec-vs-implementation framing reconciliation
+- Sprint 31.92.5 (RETRO-FOLD): F.10 sibling-parallel git-diff
+  verification + F.11 forensic-attribution threshold + F.21 wave-
+  parallelization-audit Phase C artifact + F.22 mid-sprint amendment
+  timing discipline
+- Sprint 31.92 (RETRO-FOLD): F.5 structural closure framing + F.6 FAI
+  completeness with multi-tier defense in depth + F.7 CL-N deferral
+  rationale + F.8 operator-override with proportional in-sprint
+  mitigation + Self-Anchoring Pre-Flight architectural pattern
+
+Full narrative: `evolution-notes/synthesis-sprint-31.92.6.md`.
+
+Predecessor: synthesis-2026-04-26.
 
 ---
 
