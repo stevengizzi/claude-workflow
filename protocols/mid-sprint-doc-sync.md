@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-04-28 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-05-10 -->
 # Protocol: Mid-Sprint Doc-Sync
 
 **Context:** Claude Code session OR Claude.ai conversation, depending on the trigger.
@@ -22,6 +22,30 @@ Common triggers:
 - **Tier 3 verdict surfacing materializable items.** Tier 3 surfaced DEFs that route into in-flight or upcoming sessions; CLAUDE.md needs the rows; impl prompts may need amendment; the work-journal-register needs new session order rows.
 - **Impromptu hotfix changing DEF-table state.** An impromptu fix landed mid-sprint that resolves an existing DEF or files a new one; CLAUDE.md needs the transition.
 - **Contradiction-discovery sync.** Mid-sprint discovery that the spec contradicts itself or contradicts implementation reality; spec amendments + DEF filings + work-journal-register updates needed.
+
+### F.22 amendment timing discipline (canonical per Sprint 31.92.5)
+
+Mid-sprint amendments to sprint-spec / FAI / RSK should land **pre-Phase-B**
+when discovered pre-Phase-B, **pre-Phase-D-impl-prompt-generation** when
+discovered post-Phase-B-but-pre-Phase-D, and **trigger mid-sprint doc-sync
+manifest** when discovered post-Phase-D-but-mid-sprint.
+
+**Anti-pattern** (avoid): amending sprint-spec narrative AFTER impl prompts
+have been Phase-D-generated, without re-generating affected impl prompts.
+This creates spec-vs-implementation framing divergence (Sprint 31.92.6
+Tier 3 #2 Concern A canonical example).
+
+**Mitigation**: when post-Phase-D-impl-prompt-generation amendments are
+unavoidable, file the divergence as a Tier 3 input artifact + explicitly
+direct the reviewer's attention to the framing reconciliation per
+`protocols/sprint-planning.md` § Phase-D-time spec-vs-implementation
+framing reconciliation.
+
+Sprint 31.92.5 R3-18 mid-sprint amendment + Sprint 31.92 Round 3
+adversarial-review revisions are canonical instances where pre-Phase-B
+timing prevented divergence; Sprint 31.92.6 Tier 3 #2 Concern A is the
+counter-example where post-Phase-D-handoff amendment landed at sprint-
+close instead of inline reconciliation.
 
 ## When NOT to use
 
@@ -102,6 +126,32 @@ DECs written at mid-sprint syncs are durable architectural decisions that must N
 - **Pattern B (DEC depends on subsequent sessions):** the architectural decision references DEFs being resolved by subsequent sessions, OR the architectural narrative is incomplete at mid-sync. Defer to sprint-close. Manifest records the deferral. Example: Sprint 31.91's DEC-388 (cross-references DEFs being resolved in Impromptus A+B+C; defer to sprint-close).
 
 When in doubt, defer.
+
+### Pattern A vs Pattern B disposition (formalized per Sprint 31.92.6)
+
+When a mid-sprint doc-sync manifest enumerates concerns/items, each item is
+classified:
+
+- **Pattern A — materialize at mid-sprint sync**: when the architectural
+  narrative is complete at the verdict moment AND the materialization is
+  within current sprint scope. Examples: DEC additions covering structural
+  decisions whose narrative is fully formed; DEF filings for newly-
+  surfaced defects with concrete reproduction paths.
+- **Pattern B — defer to sprint-close OR successor sprint**: when (a) the
+  architectural narrative depends on subsequent session outcomes, OR (b)
+  the materialization belongs at sprint-close-as-canonical-event (e.g.,
+  sprint-spec amendments + final DEC writes), OR (c) the resolution
+  requires operator path-decision (path a/b/c style — see Sprint 31.92.6
+  reframe-disposition pattern).
+
+**When in doubt, defer (Pattern B).** Premature materialization of an
+incomplete architectural narrative creates rework risk. Pattern B's deferral
+is documented in the manifest's structured data section so sprint-close
+doc-sync can locate the deferred work.
+
+Sprint 31.92.6 Tier 3 #2 verdict-doc-sync-manifest is the canonical
+Pattern B instance: Concerns A + B + C all deferred to sprint-close
+(eventually routed to Sprint 31.92.7 via operator path-(a)).
 
 ## DEF status discipline at mid-sprint syncs
 

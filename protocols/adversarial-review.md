@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.1.0 -->
-<!-- last-updated: 2026-04-29 -->
+<!-- workflow-version: 1.2.0 -->
+<!-- last-updated: 2026-05-10 -->
 # Protocol: Adversarial Review
 
 **Context:** Claude.ai conversation (separate from sprint planning)
@@ -25,6 +25,13 @@ When sprint planning flags any of the following:
 - The Architecture document is current
 - If applicable: the Falsifiable Assumption Inventory is present in the
   Sprint Spec
+- **FAI completeness cross-check** (canonical per Sprint 31.92 F.6):
+  adversarial review verifies the FAI's multi-tier defense-in-depth
+  coverage per `protocols/sprint-planning.md` § FAI completeness. FAI items
+  missing secondary/tertiary fallback layers trigger REVISE_PLAN
+  (substantive class) or carry-forward to Phase C revision (structural
+  class) per `protocols/adversarial-review.md` § Substantive-vs-Structural
+  Rubric.
 
 ## Conversation Structure
 
@@ -153,6 +160,34 @@ but MUST include:
 - Independent design review (Tier 3 if available, otherwise a fresh
   adversarial review with FULL scope, not narrowed).
 - Round (N+2) adversarial review with full scope after the Phase B/C re-run.
+
+#### Operator-override with proportional in-sprint mitigation (canonical per Sprint 31.92 F.8)
+
+For borderline-class concerns (Round 3 C-R3-1 style — concerns whose class
+sits between MEDIUM and HIGH; not clearly REVISE_PLAN-worthy but not
+ignore-worthy either), operator may issue a **proportional in-sprint
+mitigation override** rather than full Phase B/C revision:
+
+1. **Concern class disclosure**: operator labels the concern (HIGH /
+   MEDIUM / LOW / borderline) explicitly in the adversarial-review-rationale
+   artifact at `docs/sprints/sprint-<N>/adversarial-review-rationale.md`
+2. **Mitigation shape**: operator enumerates the proportional mitigation
+   (e.g., add canary test + watchdog + cross-layer composition test
+   instead of full impl re-architecture)
+3. **Structural reasoning**: operator documents WHY the proportional
+   mitigation suffices (sound architectural argument; not just
+   sprint-bandwidth pressure)
+4. **Acceptance gate**: typically a mid-sprint Tier 3 review verifies the
+   mitigation outcome
+
+The override is **the operator's signal to the reviewer that the concern was
+considered** with full context; it is NOT a Tier 2-bypass mechanism. The
+reviewer may still surface ESCALATE if the mitigation is empirically
+insufficient at session execution.
+
+Canonical instance: Sprint 31.92 Round 3 C-R3-1 borderline-class routing
+absorbed via L3 SELL-volume ceiling + reconstructed-position refusal +
+AC2.7 watchdog instead of full L1+L2+L3+L4 re-architecture.
 
 #### Substantive vs Structural decision rubric
 

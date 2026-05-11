@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.1.0 -->
-<!-- last-updated: 2026-04-29 -->
+<!-- workflow-version: 1.2.0 -->
+<!-- last-updated: 2026-05-10 -->
 # Protocol: Tier 3 Architectural Review
 
 **Context:** Claude.ai conversation
@@ -199,3 +199,59 @@ The conversation should produce:
 8. If REVISE_PLAN: specific changes to the roadmap
 9. If PAUSE_AND_INVESTIGATE: what needs investigation and a proposed approach
 10. **If the verdict surfaces materializable items routed for in-sprint resolution:** the verdict's disposition triggers a mid-sprint doc-sync per `protocols/mid-sprint-doc-sync.md`. The mid-sync produces a `*-doc-sync-manifest.md` enumerating files touched + sprint-close transitions owed. DECs whose architectural narrative depends on subsequent sessions MUST defer to sprint-close (Pattern B). DECs whose architectural narrative is complete at the verdict moment MAY materialize at the verdict's mid-sync (Pattern A); use Pattern B when in doubt.
+
+---
+
+### Verdict language — structural closure framing (canonical per Sprint 31.92)
+
+Verdict prose should frame closure structurally, NOT as aggregate percentage
+claims. Aggregate percentages obscure binary-gate semantics; structural
+framing preserves them.
+
+**Structural framing** (canonical):
+> "Mechanism A landed at 3 standalone-SELL emit-side surfaces; AC1.4
+> invariance holds end-to-end through Phase 4 SEAL; 6 cross-layer
+> composition tests preserve binary-gate semantics; A8 lock preservation
+> verified explicitly at S4c via identity-based `is not`."
+
+**Aggregate-percentage framing** (avoid):
+> "85% of acceptance criteria are met; the remaining 15% are deferred."
+
+Aggregate-percentage framing should only appear as a quantitative
+appendix, never as the primary verdict narrative. Cross-reference Sprint
+31.92's structural closure verdict at
+`docs/sprints/sprint-31.92-def-204-round-2/tier-3-review-N-verdict.md`
+for canonical shape.
+
+### Reframe-disposition pattern (canonical per Sprint 31.92.6)
+
+When a Tier 3 review surfaces concerns whose resolution belongs at sprint-
+close OR in a successor sprint (not at the review boundary), the verdict
+may issue **PROCEED with Pattern B carry-forwards** per
+`protocols/mid-sprint-doc-sync.md` v1.1.0:
+
+- Pattern A (materialize-at-mid-sprint-sync): concerns whose architectural
+  narrative is complete at the verdict moment; reviewer recommends
+  immediate file edits
+- Pattern B (defer-to-sprint-close OR successor-sprint): concerns whose
+  architectural narrative depends on subsequent session outcomes OR on
+  operator path-decision (path a/b/c style); reviewer documents the
+  carry-forward without authoring file edits
+
+Sprint 31.92.6 Tier 3 #2's Concerns A + B + C were all Pattern B deferrals
+landing at operator's path-(a) selection at sprint-close (which routed Del.
+E + H' + J + K + AC12.5 + AC7.7 reframe to Sprint 31.92.7). This is the
+canonical reframe-disposition pattern.
+
+The reviewer's role is to **enumerate operator paths**, NOT to unilaterally
+select one. The implementer's role at the surfacing session is FLAGGED
+self-assessment (see `templates/implementation-prompt.md` v1.7.0+ §
+Self-Assessment categories canonical).
+
+**Cross-references**:
+- FLAGGED self-assessment canonical: `templates/implementation-prompt.md`
+  § Self-Assessment categories (canonical per Sprint 31.92.6)
+- Verdict combinations canonical: `templates/review-prompt.md` § Verdict
+  Combinations (canonical)
+- B1 cap re-baseline methodology: `protocols/sprint-planning.md` § Phase A
+  / B1 cap (canonical per Sprint 31.92.6)
