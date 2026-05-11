@@ -89,6 +89,13 @@ The sprint-close doc-sync prompt (typically generated from `templates/doc-sync-a
 
 ## DEC-write discipline at mid-sprint syncs
 
+> **Disambiguation**: "Pattern A vs Pattern B" in this protocol refers to
+> mid-sync materialization disposition (Pattern A = materialize-at-mid-sync;
+> Pattern B = defer-to-sprint-close). This is distinct from the test
+> Pattern A/B/C/D + X/Y/Z/W taxonomy in `templates/sprint-spec.md` v1.3.0
+> § Test Pattern Taxonomy (which classifies test methodologies, not
+> disposition timing).
+
 DECs written at mid-sprint syncs are durable architectural decisions that must NOT need rewriting at sprint-close. Two valid patterns:
 
 - **Pattern A (DEC fully describable now):** the architectural decision is complete at the mid-sync moment; cross-references all exist; the DEC has no forward-looking dependencies. Write at the mid-sync. Example: Tier 3 #1's DEC-386 (OCA architecture; Sessions 0+1a+1b+1c sealed; no forward-looking DEFs in DEC-386's narrative).
