@@ -26,6 +26,8 @@
 | 15 | CI Verification Discipline | RULE-050, RULE-052 |
 | 16 | Fix Validation | RULE-051 |
 | 17 | Architectural-Seal Verification | RULE-053 |
+| 18 | Self-Assessment Categories | RULE-054 |
+| 19 | Discrimination Methodology | RULE-055 |
 
 <!-- The non-monotonic RULE-NN order across §15/§16/§17 is intentional: sections are organized topically. RULE-051 lands in Fix Validation (§16), RULE-052 lands in CI Verification (§15) alongside RULE-050. Use this index to find a RULE by number. -->
 
@@ -149,6 +151,8 @@ RULE-038: At the start of every session, grep-verify every factual claim the pro
 
 When the re-verification disagrees with the prompt, mark the finding as RESOLVED-VERIFIED (if the fix already appears to be in place) or flag the discrepancy in the close-out — do not invent a fix for a claim that no longer holds.
 
+**Amended 2026-05-10 (Sprint 31.92.6)**: when impl-prompt narrative references symbols that diverge from grep-verified production reality (e.g., endpoint name `/audit` canonical vs `/details` speculative; Health-endpoint surface lacks expected fields), the implementer aligns to grep-verified canonical reality and discloses the divergence in close-out under MINOR_DEVIATIONS self-assessment. Disclosure may include carry-forward routing to successor sprint when the divergence has architectural implications. Canonical examples: Sprint 31.92.6 S5a-2's 2 RULE-038 disclosures.
+
 <!-- Origin: Sprint 31.9 retro, P6 + P12 + P13 + P19 + P22 + synthesis-2026-04-26 P28 (consolidated).
      Evidence: FIX-04/06/07 hit repeated spec-path drift (CSV-garbled line drifts;
      Finding 17 pointed at position_sizer.py but the real site was
@@ -177,11 +181,24 @@ RULE-039: When the prompt describes a risky batch edit (large file refactor, mul
 
 RULE-040: Small-sample sweep conclusions are directional only. Benchmarks, A/B comparisons, performance measurements, or optimization sweeps run over small samples (few symbols, few seeds, few runs, few trials) point at which direction the needle moves — they do not establish production-ready decisions. Before promoting any "winner" from a small sample, either (a) run the full-scale confirmation sweep, or (b) document explicitly that the decision is provisional and name the validation sprint that will resolve it.
 
+**Amended 2026-05-10 (Sprint 31.92.6 S5a-1) — discrimination cycle methodology canonical rigor levels:** tests-only sessions (sessions that author/amend tests without modifying production code) require **discrimination verification** to prove the new tests aren't vacuously passing. Three rigor levels canonical:
+
+- **Level 1 — `git diff` empty assertion**: minimum-viable; production code unchanged per `git diff --stat <predecessor>..HEAD -- 'argus/' 'scripts/'` empty.
+- **Level 2 — discrimination cycle**: comment out production code emission/dispatch → verify test FAILS → restore → verify test PASSES.
+- **Level 3 — MD5 byte-equality** (NEW canonical per Sprint 31.92.6 S5a-1): in addition to Level 2, capture MD5 of production code byte-for-byte before/after the discrimination cycle; verify identical. Required for sessions touching safety-critical paths (DEF-204 family; bracket OCA group threading; SELL emit choke point; reconciliation contract; alert observability subsystem). Canonical example: Sprint 31.92.6 S5a-1 discrimination cycle on `argus/execution/order_manager.py:9742-9766`.
+
+Session prompts requiring Level 3 should explicitly cite "RULE-040 Level 3" in their constraints section. RULE-055 codifies the Level 3 MD5 byte-equality procedure in detail.
+
 <!-- Origin: Sprint 31.9 retro, P7. Concrete example: ARGUS's 24-symbol
      momentum sweep in April 2026 found 2 qualifying variants, but operators
      interpreting the sweep could have over-read those specific symbols as
      universal. The same anti-pattern shows up in coverage sweeps, micro-
-     benchmarks, and any "we ran it twice and picked the faster one" flow. -->
+     benchmarks, and any "we ran it twice and picked the faster one" flow.
+     Amended 2026-05-10 per Sprint 31.92.6 S5a-1 to extend "discrimination"
+     scope from small-sample-sweep discipline to tests-only-session
+     production-code-preservation discipline. Both share the falsifiability
+     posture: prove the signal isn't sampling noise (sweep case) or vacuous
+     test pass (tests-only case). -->
 
 ---
 
@@ -348,6 +365,67 @@ This rule is a sibling of RULE-038 (session-start grep-verification of factual c
      marker, the kickoff's avoidance instruction would silently bypass
      the architectural decision. Defensive verification at session start
      is the protection. -->
+
+---
+
+## 18. Self-Assessment Categories
+
+RULE-054: FLAGGED self-assessment (canonical per Sprint 31.92.6 S5b).
+
+FLAGGED is a Self-Assessment category per RULE-011 reserved for sessions where:
+
+1. **Literal contract met**: impl-prompt's Definition-of-Done is satisfied.
+2. **Structural-class issue surfaced**: implementation discovered a structural-class issue NOT within-session-fixable (e.g., spec reframe, deferred-deliverable shape mismatch, architectural-lock-class architectural lock).
+3. **Operator paths enumerated**: implementer documents path a/b/c style options for operator-level decision.
+4. **No unilateral fix**: implementer does NOT attempt to reshape the reframe themselves.
+
+When all 4 conditions are met, FLAGGED self-assessment is canonical; Tier 2 verdict is CLEAR (NOT CLEAR-WITH-NOTES; NOT CONCERNS).
+
+FLAGGED is distinct from MINOR_DEVIATIONS:
+
+- **MINOR_DEVIATIONS** = local non-semantic deviations within session scope (RULE-038-driven canonical-reality alignments; test-infrastructure adaptations).
+- **FLAGGED** = structural-class scope-reframe disclosure requiring operator-level decision.
+
+Canonical example: Sprint 31.92.6 S5b's 24-AC reframe surfaced at AC validation suite execution.
+
+Cross-reference: `templates/implementation-prompt.md` v1.7.0+ § Self-Assessment categories; `templates/review-prompt.md` v1.4.0+ § Accepting FLAGGED self-assessment.
+
+<!-- Origin: Sprint 31.92.6 S5b. Evidence: 24-AC sprint-boundary scope-reframe
+     disclosure (Del. E + Del. H' + Del. J + Del. K + AC12.5 clusters) was
+     the canonical FLAGGED instance — literal contract met (AC parametrize
+     suite executed; 92 items collected, 66 PASS + 26 documented-exemption
+     SKIP), structural-class issue surfaced (operator must choose path
+     (a)/b/c absorption disposition), no unilateral fix. Operator selected
+     path (a) for Sprint 31.92.7 absorption. -->
+
+---
+
+## 19. Discrimination Methodology
+
+RULE-055: MD5 byte-equality discrimination (canonical per Sprint 31.92.6 S5a-1).
+
+Tests-only sessions touching safety-critical paths (DEF-204 family; bracket OCA group threading; SELL emit choke point; reconciliation contract; alert observability subsystem) MUST verify production code byte-for-byte preservation via MD5 byte-equality:
+
+1. Capture MD5 of the touched production-code region BEFORE running tests:
+   `md5sum <file>` or `python -c "import hashlib; print(hashlib.md5(open('<file>', 'rb').read()).hexdigest())"`.
+2. Run the discrimination cycle per RULE-040 Level 2 (comment out production code emission → verify test FAILS → restore → verify test PASSES).
+3. Capture MD5 of the touched production-code region AFTER discrimination cycle: must be IDENTICAL to step 1's hash.
+
+Why: Level 1 (`git diff` empty) misses whitespace + encoding drift + reformatter side-effects. Level 2 (discrimination cycle) proves the test isn't vacuous but doesn't prove byte-for-byte preservation. Level 3 (MD5 byte-equality) is the strongest verification class.
+
+Cross-reference: RULE-040 Level 3 (this RULE codifies what RULE-040 Level 3 references).
+
+Canonical example: Sprint 31.92.6 S5a-1 cross-layer composition tests on `argus/execution/order_manager.py:9742-9766`.
+
+<!-- Origin: Sprint 31.92.6 S5a-1. Evidence: cross-layer composition tests
+     for Wave 1 of the 4-primitive coordination required tests-only commits
+     against safety-critical SELL-emit choke-point code; Level 2
+     discrimination cycle proved test non-vacuity, and Level 3 MD5
+     byte-equality verified the production code at lines 9742-9766 was
+     byte-for-byte identical before and after the discrimination round.
+     Without Level 3, a whitespace-only edit (e.g., trailing-space
+     normalization on save) would silently slip past Level 1 git-diff and
+     Level 2 fail/pass cycle. -->
 
 ---
 

@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.3.0 -->
-<!-- last-updated: 2026-04-28 -->
+<!-- workflow-version: 1.4.0 -->
+<!-- last-updated: 2026-05-10 -->
 # Protocol: In-Flight Triage
 
 **Context:** Claude.ai conversation (Sprint Work Journal)
@@ -131,6 +131,31 @@ A useful heuristic:
 
 Both protocols produce auditable artifacts; mid-sync produces a manifest, in-flight triage updates the work-journal-register inline.
 
+### FLAGGED self-assessment in in-flight discipline (canonical per Sprint 31.92.6)
+
+When a session's literal contract is met but the implementation surfaces a
+structural-class issue requiring operator-level decision (path a/b/c
+style), the implementer self-assesses as **FLAGGED** per
+`templates/implementation-prompt.md` v1.7.0+ § Self-Assessment categories.
+
+In-flight register discipline for FLAGGED sessions:
+
+1. **Per-session register row**: documented as ✓ COMPLETE with the FLAGGED
+   verdict shape (typically MINOR_DEVIATIONS / FLAGGED depending on
+   subcategory); operator-path enumeration captured inline
+2. **Next-session sequencing**: FLAGGED sessions DO NOT block the next
+   parallel-able session from firing UNLESS the operator-path decision
+   gates a downstream session (e.g., Sprint 31.92.6 S5b FLAGGED gated
+   S5c's sprint-close work pending operator path-(a)/b/c selection)
+3. **Carry-forward routing**: FLAGGED-surfaced items route per Pattern A
+   vs Pattern B per `protocols/mid-sprint-doc-sync.md` v1.1.0+ §
+   Pattern A vs Pattern B disposition
+
+The Work Journal coordination layer (claude.ai conversation) is responsible
+for surfacing operator path-decision needs in the LITE refresh prose AND
+for sequencing the operator's response into the affected downstream
+sessions.
+
 ## Issue Categories
 
 ### Category 1: In-Session Bug
@@ -204,6 +229,55 @@ to function.
 **Example:** "The routing table could be updated incrementally instead of
 rebuilt from scratch. Would be faster but doesn't matter until we have intraday
 re-scanning."
+
+---
+
+## Forensic-Attribution Threshold
+
+### F.11 forensic-attribution threshold (canonical per Sprint 31.92.5)
+
+When a sprint-active defect's forensic attribution requires reading >3
+session close-outs OR cross-referencing >10 commits, the attribution work
+exceeds in-flight triage scope and should trigger:
+
+1. **Sprint 31.92.5 pattern**: dedicated forensic-attribution session (e.g.,
+   Sprint 31.92.5 IMPROMPTU-11 mechanism-diagnostic session at
+   `docs/sprints/sprint-31.9/IMPROMPTU-11-mechanism-diagnostic.md`)
+2. **Mid-sprint Tier 3 review** if the defect's architectural class is
+   high-severity (e.g., DEF-204's silent-accumulation cascade pattern)
+3. **In-flight register flag**: a "forensic-attribution-in-flight" marker
+   in the affected session's register row, with cross-reference to the
+   diagnostic session
+
+Forensic attribution is NOT a regular in-flight-triage shape; treat it as
+a dedicated work product. The diagnostic session produces a read-only
+artifact (no production code changes) that the next sprint's planning
+absorbs.
+
+---
+
+## Discrimination Methodology
+
+### Discrimination methodology canonical rigor levels
+
+Tests-only sessions (sessions that author/amend tests without modifying
+production code) require **discrimination verification** to prove the new
+tests aren't vacuously passing. Three rigor levels canonical:
+
+1. **Level 1 — `git diff` empty assertion**: production code unchanged
+   per `git diff --stat <predecessor>..HEAD -- 'argus/' 'scripts/'` empty
+2. **Level 2 — discrimination cycle**: comment out production code
+   emission/dispatch → verify test FAILS → restore → verify test PASSES
+3. **Level 3 — MD5 byte-equality** (NEW canonical per Sprint 31.92.6
+   S5a-1): in addition to Level 2, capture MD5 of production code
+   byte-for-byte before/after the discrimination cycle; verify identical.
+   Catches whitespace + encoding drift + reformatter side-effects that
+   Level 1 misses.
+
+Sessions self-select rigor level based on session score + production
+code surface size. Level 3 is recommended for sessions touching
+safety-critical paths (per RULE-040 in ARGUS `.claude/rules/universal.md`
+v054+).
 
 ---
 
