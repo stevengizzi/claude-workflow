@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.2.0 -->
-<!-- last-updated: 2026-05-10 -->
+<!-- workflow-version: 1.3.0 -->
+<!-- last-updated: 2026-05-12 -->
 # Protocol: Adversarial Review
 
 **Context:** Claude.ai conversation (separate from sprint planning)
@@ -266,3 +266,114 @@ A good adversarial review:
   re-litigate Round N's resolved findings
 - For sprints with a Falsifiable Assumption Inventory: cross-checks every
   inventory entry's Status and falsifying-spike adequacy
+
+---
+
+## Surgical-Fix-Class REVISE Criteria (canonical from Sprint 31.92.65 R2)
+
+**Empirical anchor:** Sprint 31.92.65 Round-2 verdict explicitly invoked surgical-class disposition with the text: *"The Round-1 escalation note's sprint-decomposition trigger is NOT met... DO NOT trigger sprint decomposition. REVISE (surgical-class)."* This was the right call but was made via reviewer judgment, not codified criteria. Codification eliminates the reviewer-judgment ambiguity.
+
+### When to invoke surgical-class disposition
+
+REVISE verdicts have an implicit binary disposition: "spec is unsound, requires substantive rework" vs "spec is sound, requires mechanical cleanup." Round-N escalation notes default to the former; the surgical-class disposition preempts the sprint-decomposition trigger when all of the following hold:
+
+1. **Substantive architectural resolutions in the prior revision pass are sound.** Prior round's fork decisions, FAI specifications, and architectural amendments do NOT require re-litigation.
+2. **Findings are stale-reference cleanup + ≤2 enumerated architectural edge cases.** Mechanical drift dominates; novel architectural decisions are bounded to a small enumeration.
+3. **Estimated revision effort < 1 hour.** Reviewer's time-budget estimate (per § Reviewer Time-Budget Guidance below) confirms the work is mechanical-scoped.
+4. **No new FAI items required (or ≤1 new FAI item that's clearly bounded).** Substantive new falsifiable assumptions indicate architectural rework, not surgical fix.
+5. **Round-N verdict text explicitly invokes "REVISE (surgical-class)" disposition.** Reviewer judgment is captured in writing; subsequent rounds can audit the surgical-class invocation against actual scope.
+
+### Verdict-text template
+
+When all 5 criteria are met, the verdict explicitly states:
+
+> "**REVISE (surgical-class) — sprint decomposition trigger NOT met.** [Rationale citing the 5 criteria.] The revision pass produces `docs/sprints/<sprint-id>/round-<N>-surgical-fix-summary.md` (per `templates/round-N-surgical-fix-summary.md`) as the canonical revision-pass output, distinct from the larger `templates/round-N-revision-summary.md` template used for non-surgical revisions."
+
+### When NOT to invoke surgical-class
+
+If any criterion is unmet, the verdict is REVISE (non-surgical-class). The revision pass produces a `round-N-revision-summary.md` instance per the canonical template. Sprint-decomposition trigger applies per existing protocol.
+
+### Audit trail
+
+Subsequent rounds (Round-(N+1) and beyond) audit the surgical-class invocation against actual revision-pass scope:
+
+- If the revision pass scope materially exceeded surgical-class bounds (e.g., introduced new FAI items beyond the ≤1 limit; required >1h of revision work), the Round-(N+1) reviewer surfaces this as a Minor finding ("surgical-class invocation in Round-N was too narrow for actual scope; future surgical-class invocations should re-examine criteria #3").
+- This feedback compounds the empirical calibration of the criteria.
+
+---
+
+## Round-N+1 Verdict-Text-Completeness Audit (canonical from Sprint 31.92.65 R3)
+
+**Empirical anchor:** Sprint 31.92.65 Round 3 N-R3-NEW-2 — the reviewer noted that the bulk-ack `_dedup_index` clearing semantic was asserted by FAI-65-D invariant (d) but not enumerated in AC4.x/AC1.5. The reviewer explicitly distinguished this as **inherited from the Round-2 verdict's FAI-65-D specification text** (which the surgical-fix pass absorbed verbatim) rather than introduced by the surgical-fix pass. Round-3 verdict text: *"The Round 3 pre-commitment rule specifically targets gaps **introduced by the surgical-fix pass**; this gap pre-dates it."*
+
+### The audit
+
+Round-N+1 reviewers verify whether Round-N's findings were absorbed correctly. They do NOT typically audit the Round-N verdict's **proposed-resolution text** for blind spots. The Round-N verdict author can have systematic blind spots that get propagated through verbatim absorption — and those blind spots survive Round-(N+1) because the reviewer's attention is on absorption verification, not on the original verdict's completeness.
+
+The Round-N+1 verdict-text-completeness audit is a deliberate scrutiny of the prior verdict's proposed-resolution text. The audit lives at `templates/round-N-adversarial-review-prompt.md` Task 3 (created in synthesis-sprint-31.92.7 D1).
+
+### Binding rule
+
+RULE-057 (Round-N+1 verdict-text completeness audit non-bypassable — see `claude/rules/universal.md`).
+
+### The 3 audit sub-questions
+
+The Round-N+1 reviewer asks:
+
+1. **Sub-question 3a — Invariants → ACs mapping.** For every verdict-proposed FAI: do its invariants map to ACs in the sprint-spec? If the invariant requires a behavior the existing AC pattern doesn't cover, was the AC pattern extended? Or is there a gap?
+
+2. **Sub-question 3b — Fix scope → downstream sweep.** For every verdict-proposed fix: does it specify ALL downstream sweep targets (not just the primary surface)? Common downstream surfaces: regression-checklist, doc-update-checklist, tier-3-review-input-template, escalation-criteria, phase-e-quality-checklist, Constraints sections, "Do NOT modify" warnings, Review Focus items, DoD bullet lists, narrative FAI/AC/DEC/RSK enumerations.
+
+3. **Sub-question 3c — Fork rejection rationale.** For every verdict-proposed fork rejection: does the rejection rationale land at the right artifact (`spec-by-contradiction.md` §"Rejecting <fork name>" subsection)? Or only in the verdict text + revision summary?
+
+### Audit findings
+
+Each finding is logged as Minor (downstream sweep gap, missing rationale placement) or Major (missed invariant-to-AC mapping that affects sprint correctness). The audit is performed at Round-N+1 (N≥2) for every adversarial review; it adds approximately 15–30 minutes to the Round-N+1 reviewer's time budget (incorporated into geometric decay calibration in § Reviewer Time-Budget Guidance below).
+
+### Failure mode the audit prevents
+
+Without the audit, gaps in Round-N verdict-proposed-resolution text persist through Round-N+1 absorption verification and surface only at sprint implementation (where the implementer is the first to discover the gap, OR worse, doesn't discover it and ships an incorrect spec). The Sprint 31.92.65 R3 N-R3-NEW-2 finding is the canonical example: a gap that pre-dated the surgical-fix pass survived two rounds of review.
+
+---
+
+## Reviewer Time-Budget Guidance (canonical from synthesis-sprint-31.92.7 O-2)
+
+**Empirical anchor:** Geometric decay validated across Sprint 31.92.65 + Sprint 31.92.7 adversarial-review rounds. Reviewer time budgets follow approximately the pattern below; future sprints can rely on the estimate for scheduling and operator-bandwidth planning.
+
+### Calibrated time budgets
+
+| Round | Target budget | Empirical median | Scope |
+|---|---|---|---|
+| 1 | ~6h | ~6h | Fresh review; full sprint package read; first-time identification of Critical / Major / Minor concerns |
+| 2 | ~1.5h | ~1.5h | Verification (concern-by-concern absorption check); Task 3 verdict-text-completeness audit (if N=2+); no fresh full-package read required |
+| 3 | ~30min | ~30min | Verification + Round 3 pre-commitment rule check; Task 3 audit typically shorter due to compounding sealedness |
+| 4+ | n/a | (not encountered in 4 sprints) | If Round 4 is reached, prior rounds' surgical-class judgments were wrong; halt and escalate |
+
+### Interpretation
+
+The decay is real and matches design intent:
+- Round 1 reads the full sprint package fresh; the budget reflects that breadth.
+- Round 2 verifies absorption against the Round-1 verdict; the budget reflects the smaller scope (read-deltas only) plus the verdict-text-completeness audit overhead.
+- Round 3 verifies absorption against the Round-2 verdict + scans for Round-3-pre-commitment-rule triggers; the budget reflects the further-reduced scope.
+
+### When the budget is materially exceeded
+
+If reviewer time exceeds the target budget by >50%, the reviewer documents the surprise in their verdict's notes section. Common causes:
+
+- A new architectural concern surfaced (i.e., the Round-N+1 reviewer found a problem the Round-(N) reviewer missed)
+- Task 3 audit found a gap the prior round missed (W-NEW2 binding)
+- The sprint package itself ballooned between rounds (revision pass added substantial new scope, which a separate amendment should have surfaced)
+
+The time-budget data feeds future calibration of this guidance. Updates to the table above are appended at every synthesis sprint based on cumulative empirical data.
+
+### When the budget is NOT met (underrun)
+
+If reviewer time is materially below target (e.g., Round 1 completed in <2h):
+- Either the sprint package is unusually small (verify by counting AC enumeration + impl prompts) — acceptable.
+- Or the reviewer is rushing — a Round-(N+1) finding may surface; reviewer time-quality tradeoff is real.
+
+Operator should treat underruns with mild skepticism, not concern.
+
+### Round 3 pre-commitment rule calibration (O-3 cross-reference)
+
+Sprint 31.92.65 produced 3 Critical (R1) → 2 Critical (R2 surgical-class) → 0 Critical (R3). The Round 3 pre-commitment rule iteratively tightens without forcing architectural rework. The cumulative-REVISE chain breaks cleanly at Round 3 when new findings are non-primitive-semantics-relevant. The rule's threshold ("foundational primitive-semantics misses → REVISE; other Critical → CLEAR-WITH-NOTES + RSK") is well-calibrated. No adjustment recommended in this synthesis sprint.
