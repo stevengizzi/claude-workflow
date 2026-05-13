@@ -99,4 +99,10 @@ D2 ran independently of D1 (no D1 dependency per kickoff Pre-Flight #5). D1's 5 
 
 ## Commit + Push
 
-(To be appended after commit lands.)
+- **Commit SHA:** `aeec10e`
+- **Branch:** `main`
+- **Remote update:** `96e26d0..aeec10e  main -> main` (push succeeded against `origin/main`)
+- **Push parity verified:** `git log --oneline origin/main..HEAD` returned empty after push.
+- **Files in commit:** 3 (2 template amendments + this close-out). 222 insertions, 4 deletions per `git diff --stat`.
+
+Session DONE — D2 contract satisfied; all 5 amendments + 2 version bumps + close-out + commit + push complete.
