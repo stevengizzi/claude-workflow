@@ -59,7 +59,6 @@ None. D2/D3/D5 sessions will reference these templates per the synthesis sprint 
 
 ## Commit + Push Verification
 
-To be filled after commit.
-
-- **Commit SHA:** _(to be filled)_
-- **Push parity verification:** `git log --oneline origin/main..HEAD` _(expected empty after push)_
+- **Commit SHA:** `2aca5d636f1470d1cd10b0fbe9db04fe0a005604`
+- **Push parity verification:** `git log --oneline origin/main..HEAD` returned empty ✓ (commit landed at `origin/main`).
+- **Push diff:** `b0ebc23..2aca5d6  main -> main`.
