@@ -73,9 +73,11 @@ No structural-class issues (no FLAGGED disposition required). No scope expansion
 
 ## Commit + Push
 
-**Disposition note (per the new WJ-5 §Non-Substantive Artifact Separation discipline this session itself canonicalizes):** this session produces no non-substantive artifact rebaselines (no spike-results JSON drift). Single-commit fold: WJ-1 + WJ-2 amendments + version header + close-out all land as one commit, consistent with the kickoff's stated commit format and predecessor D1/D2/D3 pattern.
+**Disposition note (per the new WJ-5 §Non-Substantive Artifact Separation discipline this session itself canonicalizes):** this session produces no non-substantive artifact rebaselines (no spike-results JSON drift). Single-commit fold: WJ-1 + WJ-5 amendments + version header + close-out all land as one commit, consistent with the kickoff's stated commit format and predecessor D1/D2/D3 pattern.
 
-(SHA + push parity verified post-commit in §Self-Verification below.)
+- **Commit SHA:** `2db9b2b`
+- **Push parity:** verified — `git log --oneline origin/main..HEAD` returned empty.
+- **Remote ref:** `10ae202..2db9b2b  main -> main` on `https://github.com/stevengizzi/claude-workflow.git`
 
 ## Deferred Items
 
