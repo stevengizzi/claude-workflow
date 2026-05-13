@@ -180,8 +180,9 @@ Not FLAGGED: no structural-class scope-reframe; no operator-level decision requi
 
 ## Commit + Push
 
-Commit SHA: (to be filled after commit)
-Push parity verified: (to be filled after push)
+Commit SHA: `279e110` (seal commit on `main`)
+Push parity verified: `git log --oneline origin/main..HEAD` empty after push (origin/main now at 279e110 matching local HEAD).
+Push range: `a695962..279e110`.
 
 ---
 
