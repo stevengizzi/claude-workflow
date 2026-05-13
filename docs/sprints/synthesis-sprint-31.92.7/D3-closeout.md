@@ -114,7 +114,9 @@ No structural-class issues (no FLAGGED disposition required). No scope expansion
 
 ## Commit + Push
 
-To follow per the kickoff's §Close-Out / Commit + Push subsection.
+- **Commit SHA:** `44131ce`
+- **Push parity:** verified — `git log --oneline origin/main..HEAD` returned empty.
+- **Remote ref:** `774c7d9..44131ce  main -> main` on `https://github.com/stevengizzi/claude-workflow.git`
 
 ## Deferred Items
 
