@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.5.0 -->
-<!-- last-updated: 2026-05-10 -->
+<!-- workflow-version: 1.6.0 -->
+<!-- last-updated: 2026-05-12 -->
 # Protocol: Sprint Planning
 
 **Context:** Claude.ai conversation(s)
@@ -259,6 +259,32 @@ work-driven overage at S5b).
      CLAUDE.md sprint-health note records the +332 one-shot overage
      disposition. -->
 
+### API-Surface Verification (mandatory; gates Phase B)
+
+**Empirical anchor:** W-2 confirmed across 4 consecutive sprints (Sprint 31.92, 31.92.5, 31.92.65, 31.92.7). Each Round-1 adversarial-review verdict in those sprints surfaced 3–4 Critical primitive-semantics misses attributable to un-verified API/method/class/field/file-path citations. The mandatory artifact + Phase B gating prevents these misses from leaving Phase A.
+
+**Binding rule:** RULE-056 (Phase A API-surface verification artifact non-bypassable — see `claude/rules/universal.md`).
+
+**Procedure:**
+
+1. After authoring the joint design summary, problem statement, and any other Phase A artifacts, the Phase A author produces `docs/sprints/<sprint-id>/phase-a-api-surface-audit.md` using the canonical template at `templates/phase-a-api-surface-audit.md`.
+2. The artifact enumerates **every production-code name** cited in any Phase A artifact:
+   - functions / methods / classes / dataclass fields / attributes / ABC methods
+   - file paths / config field names / enum values / constants
+3. Each row is classified VERIFIED / NEW / DRIFT per the template.
+4. **DRIFT rows GATE Phase B.** Phase B cannot proceed until all DRIFT rows are RESOLVED (citing artifact corrected + resolution commit SHA recorded in the audit artifact's Section 2).
+5. The Phase A author asserts completion via the audit artifact's Section 3 checklist. Phase B is structurally blocked until all four checkboxes resolve.
+
+**Why this is non-bypassable:**
+
+The 4-consecutive-sprint W-2 confirmation produced specific example misses preserved in the audit's empirical-anchor citations:
+
+- Sprint 31.92.7 R1: `broker.get_positions(symbol)` doesn't exist; `on_order_filled` doesn't exist (actual: `on_fill`); "12-field metadata" (actual: 13).
+- Sprint 31.92.65 R1: `ActiveAlert.last_observed_at` doesn't exist; `bulk_ack_id` column doesn't exist; `HealthMonitorConfig` doesn't exist (actual: `AlertsConfig`).
+- Sprint 31.92.65 R2: `bus.emit()` doesn't exist (actual: `publish()`); `Layout.tsx` mount path doesn't exist (actual: `AppShell.tsx`); `frontend/...` path prefix doesn't exist (actual: `argus/ui/src/...`); `operations.sql` file doesn't exist (Python migrations).
+
+Each of these misses would have been caught at the Phase A audit; each cost an adversarial-review cycle to surface. The mandatory artifact's cost (~30 min for the Phase A author) is amortized across every adversarial-review cycle it eliminates.
+
 ### Phase B: Checkpoint
 
 Before generating any artifacts:
@@ -355,6 +381,20 @@ CL-6 deferral) is acceptable when:
 
 CL-N deferrals should NOT exceed 2 per sprint; if 3+ cross-layer tests
 defer, the sprint scope itself needs Phase A re-evaluation.
+
+### Cross-Document API-Shape Matrix (W-4 binding)
+
+**Empirical anchor:** W-4 confirmed at Sprint 31.92.7 Round-2 drift cleanup (commit `7e0f780e`: 33 edits across 12 secondary artifacts). Four patterns persisted after Round-2 verdict's primary-surface corrections: `on_fill` rename (4 surfaces), Fork B selection (6 surfaces), "13-field" correction (8 surfaces), count-chain update (13 surfaces), S4 keyword (2 surfaces).
+
+**Procedure:**
+
+1. After Phase C produces the sprint-spec, joint design summary updates, and impl prompts, the Phase C author initializes `docs/sprints/<sprint-id>/cross-document-api-shape-matrix.md` using the canonical template at `templates/cross-document-api-shape-matrix.md`.
+2. The matrix enumerates every API/method/class/field/file-path cited in the sprint package, tracked across columns for each downstream artifact (sprint-spec, joint design summary, per-session impl prompts, regression-checklist, doc-update-checklist, tier-3-review-input-template, escalation-criteria, phase-e-quality-checklist).
+3. **Refresh cadence:** the matrix is refreshed at **every revision pass** (per the Phase D Revision-Pass Sweep Checklist below). Each pass appends a row to the matrix's update log (Section 2).
+
+**Why this is a Phase C deliverable:**
+
+W-4's empirical signature: 33 edits at Round-2 drift cleanup arrived AFTER the primary-surface corrections. The drift surfaced because the revision-pass author updated only the canonical citation (e.g., sprint-spec.md AC1.1) and the secondary-document citations (e.g., regression-checklist check #4) lagged. The matrix makes the multi-document drift surface visible at revision-pass time, preventing the drift from accumulating to a Round-2 verdict finding.
 
 ### Phase C-1: Adversarial Review Gate
 
@@ -567,6 +607,61 @@ When parallel sessions both modify a shared file (e.g., docs/sprint-history.md
 sprint append entries), the sibling-parallel discipline is broken; convert
 to sequential execution OR rescope.
 
+### Revision-Pass Sweep Checklist (canonical from synthesis-sprint-31.92.7)
+
+A revision pass MUST include the following sweeps. Failure to sweep is a recurring Round-(N+1) audit finding (W-NEW, W-1, W-NEW additive variant).
+
+#### Sweep 1 — Bidirectional Phase A ↔ Phase C Consistency Check (W-1)
+
+**Empirical anchor:** Sprint 31.92.65 Round 2 N-R2-4 — joint design summary §A4 still cited the REJECTED cadence-from-`last_emit_at` architecture after Round-2 revision moved cadence producer-side. Surgical fix corrected at commit `f09e9dad`. The risk: Sprint 31.92.7 planner reading the joint summary for Sprint 31.92.65 context would inherit the stale architectural commitment.
+
+**Procedure:** After Phase C amendments alter any architectural choice, the revision-pass author MUST sweep Phase A artifacts (joint design summaries, problem statements, preliminary design documents) and either:
+
+- **Update** the Phase A artifact to reflect the new architecture, OR
+- **Annotate** the Phase A section as "superseded by Phase C Amendment AMD-N" with a cross-reference to the absorbing amendment.
+
+Failure to update OR annotate is a Major Round-(N+1) finding (cross-sprint contamination risk).
+
+#### Sweep 2 — Constraints / Scope / Review-Focus / DoD / Narrative Sweep (W-NEW amendment-class)
+
+**Empirical anchor:** Sprint 31.92.65 Round 2 N-R2-2 (Critical) — S2 impl Constraints section still said "this session reads `last_emit_at` from existing ActiveAlert" after Round-1 revision moved cadence producer-side and removed `last_emit_at`. The implementer would have prioritized the "Do NOT modify" warning as authoritative — leading to broken implementation.
+
+**Procedure:** When a revision pass changes an architectural surface, sweep ALL of:
+
+- §Constraints sections (per impl prompt)
+- "Do NOT modify" warnings (per impl prompt + per session)
+- §Scope Boundaries (per impl prompt)
+- §Review Focus items (per impl prompt)
+- §Definition of Done bullet lists (per session)
+- Narrative text containing FAI / AC / DEC / RSK enumerations (across all artifacts)
+
+For each surface, verify the prior-revision-state instruction has been updated to match the new architectural state. Run `grep -rciE "<stale-pattern>" docs/sprints/<sprint-id>/` and confirm 0 hits before declaring sweep complete.
+
+#### Sweep 3 — Additive-Change Letter-Suffix Sweep (W-NEW additive variant)
+
+**Empirical anchor:** Sprint 31.92.65 Round 3 N-R3-NEW-1 (Minor) — adding FAI-65-D updated the canonical FAI table + S1 spike spec, but 3 narrative/DoD/Review-Focus references in S5 still listed "FAI-65-A/B/C" instead of "FAI-65-A/B/C/D" (at lines 54, 253, 348).
+
+**Procedure:** When adding FAI-X / AC-X / DEC-X / RSK-X to a sprint that already contains the (X-1) variant, sweep ALL references to (X-1)-bounded letter-suffix lists and append X:
+
+```bash
+# Example: adding FAI-65-D
+grep -rciE 'FAI-65-A/B/C(?!/D)' docs/sprints/sprint-31.92.65/
+# Expected after sweep: 0 hits (all updated to A/B/C/D)
+```
+
+The sweep targets enumerations in narrative, DoD, Review Focus, regression-checklist items — anywhere a letter-suffix list might enumerate the prior count.
+
+#### Sweep 4 — Cross-Document API-Shape Matrix Refresh (W-4 binding)
+
+After completing Sweeps 1–3, append a row to the sprint's `cross-document-api-shape-matrix.md` update log (§Section 2) capturing the revision pass's changes:
+
+- Rows added (new names introduced by amendments)
+- Rows updated (existing names appeared in new locations)
+- Rows DRIFT → CORRECTED (pre-revision drift cleared by this pass)
+- New patterns identified (if any)
+
+The matrix refresh is the durable record that all 4 sweeps completed.
+
 ### Phase E: Verify
 
 After all artifacts are generated:
@@ -743,3 +838,34 @@ runner will halt with "Prompt file not found."
 **Close-out and review reports** (written during execution, not during planning):
 - `session-{M}-closeout.md` — written by the implementation session
 - `session-{M}-review.md` — written by the @reviewer subagent
+
+---
+
+## Three-Stream Parallel Execution (canonical from synthesis-sprint-31.92.7)
+
+**Empirical anchor:** O-1 validated during Sprint 31.92.7 + Sprint 31.92.65 concurrent planning window. Sprint 31.92.7 revision pass + Sprint 31.92.65 revision pass + Work Journal initialization successfully ran in parallel with disjoint file targets.
+
+### When parallel execution is permissible
+
+The pattern is permissible when **all** of the following hold:
+
+1. **Disjoint file targets.** Each parallel stream operates on a separate sprint folder, and the streams do not share any file. Verify via `git status` per stream — any overlap aborts parallelization.
+2. **≤3 active Claude.ai conversations + 1 Work Journal.** Cognitive load ceiling. Beyond this count, operator context-switching cost exceeds throughput gain.
+3. **Adversarial review is NOT in parallel with its own revision pass.** The audit-trail dependency is sequential: a revision pass MUST commit before the next adversarial review on the same sprint begins. (Parallel adversarial review of OTHER sprints is fine.)
+
+### When parallel execution is NOT permissible
+
+- Two streams modifying the same file (even at non-overlapping line ranges) — merge conflicts are likely; the operator's mental model degrades.
+- Two streams within the same sprint (e.g., S2 + S3 of Sprint 31.92.7) — implementation-prompt dependencies create sequential ordering.
+- Adversarial review of Sprint X in parallel with the revision pass of Sprint X — the reviewer needs the revision pass's commit as audit-trail input.
+
+### Operational guidance
+
+- **Begin parallel streams with explicit boundary declaration:** name each stream (e.g., "Stream A: Sprint 31.92.7 R2 revision"; "Stream B: Sprint 31.92.65 R2 revision"; "Stream C: Sprint 31.92.8 Work Journal initialization"). Operator tracks stream-level progress separately.
+- **Use Self-Anchoring Pre-Flight per stream:** each stream captures its own anchor SHA. Streams may capture different SHAs if commits land between stream starts.
+- **No cross-stream conversation hopping mid-edit:** once a stream's session is in-flight (impl prompt being executed), avoid context-switching to another stream until the current session's close-out is written.
+
+### Failure modes
+
+- **Phantom merge conflicts:** if two streams' files appear adjacent in the repo tree, even disjoint files can cause review-time visual confusion. Mitigation: explicit stream-name in commit messages.
+- **Operator memory leak:** running 3 streams + a Work Journal for >3 hours leads to per-stream state confusion. Mitigation: rotate streams every ~90 minutes; capture stream-state in Work Journal between rotations.
