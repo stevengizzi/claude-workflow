@@ -28,6 +28,8 @@
 | 17 | Architectural-Seal Verification | RULE-053 |
 | 18 | Self-Assessment Categories | RULE-054 |
 | 19 | Discrimination Methodology | RULE-055 |
+| 20 | Phase A API-Surface Verification | RULE-056 |
+| 21 | Round-N+1 Verdict-Text Completeness Audit | RULE-057 |
 
 <!-- The non-monotonic RULE-NN order across §15/§16/§17 is intentional: sections are organized topically. RULE-051 lands in Fix Validation (§16), RULE-052 lands in CI Verification (§15) alongside RULE-050. Use this index to find a RULE by number. -->
 
@@ -426,6 +428,56 @@ Canonical example: Sprint 31.92.6 S5a-1 cross-layer composition tests on `argus/
      Without Level 3, a whitespace-only edit (e.g., trailing-space
      normalization on save) would silently slip past Level 1 git-diff and
      Level 2 fail/pass cycle. -->
+
+---
+
+## 20. Phase A API-Surface Verification
+
+RULE-056: Phase A API-surface verification artifact non-bypassable (canonical per synthesis-sprint-31.92.7 D6).
+
+**Empirical anchor:** W-2 confirmed across 4 consecutive sprints (Sprint 31.92, 31.92.5, 31.92.65, 31.92.7). Each Round-1 adversarial-review verdict in those sprints surfaced 3–4 Critical primitive-semantics misses attributable to un-verified API/method/class/field/file-path citations.
+
+**Rule:** Phase A of every sprint MUST produce a `docs/sprints/<sprint-id>/phase-a-api-surface-audit.md` artifact, per the canonical template at `templates/phase-a-api-surface-audit.md`. The artifact enumerates every production-code name (function, method, class, dataclass field, attribute, ABC method, file path, config field, enum value, constant) cited in any Phase A artifact (joint design summary, sprint-spec preliminary draft, problem statement).
+
+**Non-bypassable contract:**
+
+- Each cited name in Phase A artifacts is classified VERIFIED / NEW / DRIFT in the audit.
+- **DRIFT rows GATE Phase B.** Phase B is structurally blocked until all DRIFT rows are RESOLVED (citing artifact corrected; resolution commit SHA recorded in the audit's Section 2).
+- The Phase A author asserts completion via the audit's Section 3 checklist. Phase B is structurally blocked until all four checkboxes resolve.
+
+**Why non-bypassable:** the 4-consecutive-sprint empirical anchor is overwhelming. Each Round-1 verdict's Critical misses cost an adversarial-review cycle to surface; the mandatory artifact's ~30-minute Phase A cost is amortized across every cycle it eliminates. Sprint 31.92.8 onward is the inaugural test of this rule's effect.
+
+**Cross-references:**
+- Canonical template: `templates/phase-a-api-surface-audit.md`
+- Protocol binding: `protocols/sprint-planning.md` Phase A §API-Surface Verification
+- Synthesis origin: synthesis-sprint-31.92.7 D6.
+
+---
+
+## 21. Round-N+1 Verdict-Text Completeness Audit
+
+RULE-057: Round-N+1 verdict-text completeness audit non-bypassable (canonical per synthesis-sprint-31.92.7 D6).
+
+**Empirical anchor:** W-NEW2 first surfaced at Sprint 31.92.65 Round 3 (N-R3-NEW-2). The Round-3 reviewer found that the bulk-ack `_dedup_index` clearing semantic was asserted by FAI-65-D invariant (d) but not enumerated in AC4.x/AC1.5. The reviewer explicitly distinguished the gap as **inherited from the Round-2 verdict's FAI-65-D specification text** rather than introduced by the surgical-fix pass — gaps in verdict-proposed-resolution text survive verbatim absorption.
+
+**Rule:** Every Round-N (N≥2) adversarial review MUST perform the Task 3 verdict-text-completeness audit per the canonical template at `templates/round-N-adversarial-review-prompt.md`. The audit scrutinizes the Round-(N-1) verdict's proposed-resolution text for three classes of blind spots:
+
+1. **Invariants → ACs mapping** — does every verdict-proposed FAI's invariants map to ACs in the sprint-spec? Are AC patterns extended where invariants require it?
+2. **Fix scope → downstream sweep** — does every verdict-proposed fix specify ALL downstream sweep targets (regression-checklist, doc-update-checklist, Constraints sections, Review Focus items, DoD bullet lists, narrative enumerations)?
+3. **Fork rejection rationale** — does every verdict-proposed fork rejection land the rationale at the canonical artifact (`spec-by-contradiction.md` §"Rejecting <fork name>")?
+
+**Non-bypassable contract:**
+
+- Round-N (N≥2) reviewer MUST include Task 3 findings in the verdict output.
+- Findings are logged as Minor (downstream sweep gap, missing rationale placement) or Major (missed invariant-to-AC mapping that affects sprint correctness).
+- Skipping the audit invalidates the Round-N verdict; the Round-N reviewer must re-issue with audit complete.
+
+**Why non-bypassable:** without the audit, gaps in Round-N verdict-proposed-resolution text persist through Round-N+1 absorption verification and surface only at sprint implementation. The Sprint 31.92.65 R3 N-R3-NEW-2 finding is the canonical example: a gap that pre-dated the surgical-fix pass survived two rounds of review before the audit surfaced it.
+
+**Cross-references:**
+- Canonical template: `templates/round-N-adversarial-review-prompt.md` Task 3
+- Protocol binding: `protocols/adversarial-review.md` §Round-N+1 Verdict-Text-Completeness Audit
+- Synthesis origin: synthesis-sprint-31.92.7 D6.
 
 ---
 

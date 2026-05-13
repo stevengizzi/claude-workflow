@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.1.0 -->
-<!-- last-updated: 2026-05-10 -->
+<!-- workflow-version: 1.2.0 -->
+<!-- last-updated: 2026-05-12 -->
 # Workflow Bootstrap Index
 
 > This file is the sole workflow reference in this Claude.ai project's knowledge.
@@ -193,32 +193,23 @@ Adopt the new version for the next sprint.
 
 ## Recent Synthesis Sprints
 
-**synthesis-sprint-31.92.6 — completed 2026-05-10**
+**synthesis-sprint-31.92.7 — completed 2026-05-12**
 
-Metarepo synthesis sprint absorbing Sprint 31.92 + 31.92.5 + 31.92.6
-RETRO-FOLD lessons. 5 sessions: D1 templates / D2 sprint-planning +
-sprint-spec / D3 review protocols / D4 in-flight + ARGUS universal RULEs
-/ D5 bookkeeping closure. 8 metarepo files amended + 2 new ARGUS RULEs
-(RULE-054 FLAGGED canonical + RULE-055 MD5 byte-equality discrimination)
-+ 1 new evolution-notes file. Cumulative lessons folded:
+Metarepo synthesis sprint absorbing Sprint 31.92.65 + Sprint 31.92.7 adversarial-review-derived candidates + Sprint 31.92.7 Work-Journal-derived supplementary candidates. **16 distinct amendments folded across 6 sessions** — the largest synthesis sprint to date. 6 sessions: D1 five new templates / D2 existing template amendments (sprint-spec.md + implementation-prompt.md) / D3 sprint-planning protocol (6 amendments) / D4 in-flight-triage protocol (Work-Journal candidates) / D5 adversarial-review protocol (3 new H2 sections) / D6 bookkeeping closure (RULE-056 + RULE-057 + this index + evolution-notes).
 
-- Sprint 31.92.6 (NEW): FLAGGED canonical + B1 cap methodology +
-  path-(a) reframe pattern + Pattern X/Y/Z/W taxonomy + MD5 byte-equality
-  discrimination + POLICY_TABLE precedent class + F3 disposition
-  flexibility + 4 verdict-self-assessment combinations + Phase-D-time
-  spec-vs-implementation framing reconciliation
-- Sprint 31.92.5 (RETRO-FOLD): F.10 sibling-parallel git-diff
-  verification + F.11 forensic-attribution threshold + F.21 wave-
-  parallelization-audit Phase C artifact + F.22 mid-sprint amendment
-  timing discipline
-- Sprint 31.92 (RETRO-FOLD): F.5 structural closure framing + F.6 FAI
-  completeness with multi-tier defense in depth + F.7 CL-N deferral
-  rationale + F.8 operator-override with proportional in-sprint
-  mitigation + Self-Anchoring Pre-Flight architectural pattern
+7 metarepo files amended: `protocols/in-flight-triage.md` v1.5.0 + `templates/implementation-prompt.md` v1.8.0 + `templates/sprint-spec.md` v1.4.0 + `protocols/sprint-planning.md` v1.6.0 + `protocols/adversarial-review.md` v1.3.0 + `claude/rules/universal.md` (+2 new RULEs) + `bootstrap-index.md` v1.2.0. **5 new templates created** at D1: `round-N-revision-summary.md` + `round-N-surgical-fix-summary.md` + `round-N-adversarial-review-prompt.md` + `phase-a-api-surface-audit.md` + `cross-document-api-shape-matrix.md`. 1 new evolution-notes file. Lessons folded:
 
-Full narrative: `evolution-notes/synthesis-sprint-31.92.6.md`.
+- ⭐ HIGHEST: W-2 Phase A API-surface verification (4 consecutive sprints empirical anchor; RULE-056 non-bypassable)
+- HIGH: W-1 Phase A↔C bidirectional consistency (4 sprints) + W-NEW Constraints/Scope/Review-Focus/DoD/narrative sweep + W-4 cross-document API-shape matrix + WJ-1 register-refresh canonical-artifact cross-check
+- MEDIUM: W-NEW2 verdict-text-completeness audit (RULE-057 non-bypassable) + W-NEW3 surgical-fix-class REVISE codification + WJ-2 Tier 2 Enumeration Imperative + WJ-3 non-negotiable invocation + W-NEW additive-variant letter-suffix sweep
+- LOW: WJ-4 Self-Anchoring schematic-spec/grep/RULE-038 triangle + WJ-5 spike-results JSON chore-isolate default + 3 new template patterns (T-1/T-2/T-3 codified)
+- Operational learnings: O-1 three-stream parallel execution feasibility + O-2 reviewer time-budget geometric decay calibration
 
-Predecessor: synthesis-2026-04-26.
+**Headline:** W-2 Phase A API-surface verification amendment. 4-consecutive-sprint empirical anchor with 3–4 Critical primitive-semantics misses per Round-1 verdict in each sprint. RULE-056 makes the Phase A audit artifact non-bypassable. Sprint 31.92.8 will be the inaugural test of the new workflow.
+
+Full narrative: `evolution-notes/synthesis-sprint-31.92.7.md`.
+
+Predecessor: synthesis-sprint-31.92.6.
 
 ---
 
