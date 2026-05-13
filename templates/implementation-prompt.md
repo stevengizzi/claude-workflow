@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.7.0 -->
-<!-- last-updated: 2026-05-10 -->
+<!-- workflow-version: 1.8.0 -->
+<!-- last-updated: 2026-05-12 -->
 # Template: Implementation Prompt
 
 Fill in all bracketed sections. The structure of this prompt is designed to
@@ -116,6 +116,31 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     methodology. Sibling-adjacent to F.10 sibling-parallel verification (Sprint
     31.92.5 retrospective candidate) — both patterns codify "encode the
     starting state explicitly so deviations from it are auditable."
+
+    **Amended 2026-05-12 (Sprint 31.92.7)**: Self-Anchoring Pre-Flight
+    composes with § Files to Modify > Structural anchor + pre-flight grep-
+    verify and with RULE-038 (session-start grep-verification of factual
+    claims) to form a three-element discipline triangle, validated through
+    Sprint 31.92.7 IMP-12.5:
+
+    1. **Schematic spec gives intent.** Impl-prompt pseudo-code, narrative
+       shapes, and "after this session, the file should look like X"
+       framings describe the destination state.
+    2. **Grep verifies current state.** Per-edit grep-verify commands (and
+       broader RULE-038 grep-verify-of-claims posture) anchor what's
+       actually true at HEAD before the schematic spec is applied.
+    3. **RULE-038 prefers semantic anchors over line numbers.** Where the
+       schematic spec and grep diverge, the implementer aligns to grep-
+       verified reality and discloses under MINOR_DEVIATIONS — line numbers
+       are directional only.
+
+    The triangle's value: schematic intent + grep reality + semantic-anchor
+    preference together prevent the failure mode where an impl prompt
+    encodes line numbers or symbol surfaces that drifted between authoring
+    and execution, leading the implementer to either (a) edit at the wrong
+    location, or (b) silently "correct" the schematic shape without
+    disclosure. IMP-12.5 validated the schematic-grep-RULE-038 triangle
+    across 9 ACs at the close of Sprint 31.92.7.
 
     ## Objective
     [1-2 sentences: what this session accomplishes]
@@ -431,6 +456,28 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     4. The test command: [exact test command — see DEC-328 note below]
     5. Files that should NOT have been modified: [list]
 
+    ### Enumeration Imperative (canonical from Sprint 31.92.7)
+
+    When passing the @reviewer instructions that include claims of the form
+    "N tests confirmed failing" (e.g., in the Session-Specific Review Focus
+    or Sprint-Level Regression Checklist sections), bound the claim. Either:
+
+    - **Enumerate the failing tests by name** (preferred): "7 tests failing:
+      `test_a`, `test_b`, ..., `test_g`"
+    - **Mark the count as a lower-bound observation**: "at least 7 failures
+      observed in the scope checked; reviewer to extend the scope if a
+      fuller enumeration is warranted"
+
+    Sprint 31.92.7 CF-S2-1's recurring "N tests confirmed failing" claim grew
+    from "7" at initial verdict-time to "11 tests across 5 files" by later
+    Tier 3 review. The growth was not a regression; it was an unbounded-claim
+    artifact — the initial verdict's unbounded claim allowed the count to
+    drift upward as the reviewer expanded scope. The enumeration imperative
+    prevents the drift by making the verdict-time scope auditable.
+
+    This applies equally to the @reviewer's verdict-time claims (cross-
+    reference `templates/round-N-adversarial-review-prompt.md` Task 1).
+
     The @reviewer will produce its review report (including a structured JSON
     verdict fenced with ```json:structured-verdict) and write it to:
     docs/sprints/sprint-[N]/session-[M]-review.md
@@ -452,6 +499,20 @@ followed by mandatory Tier 2 review via the @reviewer subagent.
     The runner's _run_review() step can be simplified to: verify the review
     file exists at the expected path, then extract the structured verdict from
     it.]
+
+    [PLANNING NOTE: The § Tier 2 Review section's invocation contract is
+    non-negotiable. Sprint 31.92.7 S5–S13 surfaced drift across multiple
+    impl prompts where the invocation wording was paraphrased; IMP-12.5
+    remediated by encoding the invocation prompt verbatim. When Phase D
+    authors generate impl prompts (especially trifold refreshes), the
+    section header + the "After the close-out is written... invoke the
+    @reviewer subagent..." sentence + the 5-item provide-the-@reviewer-with
+    list MUST be copied verbatim. The acceptable Phase-D-time variations
+    are limited to: (a) substituting [path to review-context.md], [N], [M],
+    and other bracketed placeholders with actuals; (b) tightening the test
+    command per the DEC-328 non-final/final guidance above. All other
+    content is canonical. Origin: Sprint 31.92.7 IMP-12.5 verbatim re-
+    encoding remediation.]
 
     ## Post-Review Fix Documentation
     If the @reviewer reports CONCERNS and you fix the findings within this same

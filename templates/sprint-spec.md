@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.3.0 -->
-<!-- last-updated: 2026-05-10 -->
+<!-- workflow-version: 1.4.0 -->
+<!-- last-updated: 2026-05-12 -->
 # Template: Sprint Spec
 
 Fill in all sections. Leave nothing as TBD -- if something is genuinely unknown,
@@ -229,6 +229,32 @@ that is a signal to do more discovery before committing to the sprint.
          correctness depended on primitive-semantics claims that were not
          enumerated, let alone falsified. This section closes that gap. -->
 
+    ### Additive-change letter-suffix sweep (canonical from Sprint 31.92.65 R3 N-R3-NEW-1)
+
+    When adding FAI-X to a sprint that already contains FAI-(X-1), the spec
+    author MUST sweep ALL references to FAI-(X-1) lists and append X. Failure
+    to sweep is a Round-(N+1) Minor finding (W-NEW additive variant).
+
+    **Sweep targets** (not exhaustive — check every artifact in the sprint
+    package):
+
+    - sprint-spec.md narrative referring to "FAI-N-A/B/C" → must become
+      "FAI-N-A/B/C/D"
+    - Per-session DoD bullet lists enumerating FAIs
+    - §Review Focus items citing FAI-N-A/B/C
+    - Per-session impl prompts referring to FAI-N letter-suffix lists in
+      §Pre-Flight Checks or §Verification Targets
+
+    **Sweep procedure** (run before sprint-spec.md commit):
+
+        # Example: adding FAI-65-D to Sprint 31.92.65
+        grep -rciE 'FAI-65-A/B/C(?!/D)' docs/sprints/sprint-31.92.65/
+        # Expected after sweep: 0 hits (all updated to FAI-65-A/B/C/D)
+
+    Empirical anchor: Sprint 31.92.65 Round 3 N-R3-NEW-1 caught 3 stale
+    `A/B/C` references in S5 narrative/DoD/Review-Focus sections at lines 54,
+    253, 348 after FAI-65-D was added at Round 2.
+
     ## Hypothesis Prescription (if applicable)
 
     Include this section ONLY for sprints whose first session begins with a
@@ -279,3 +305,32 @@ that is a signal to do more discovery before committing to the sprint.
     [N] sessions estimated. [Brief rationale for the estimate.]
     [If frontend sessions with visual review items: +0.5 sessions budgeted
     for visual-review fix contingency.]
+
+    ## Production-Code Surfaces
+
+    Document conventions for how this sprint cites production-code surfaces
+    (file paths, modules, identifiers). These conventions are enforced at
+    sprint-spec.md authoring time and propagate to downstream artifacts.
+
+    ### File-path convention (canonical from Sprint 31.92.65 R2 W-NEW2)
+
+    All file paths cited in sprint-spec.md AND downstream artifacts MUST use
+    full repo-rooted paths:
+
+    - ✅ `argus/ui/src/components/AlertBanner.tsx`
+    - ❌ `frontend/components/AlertBanner.tsx` (path prefix doesn't exist)
+    - ✅ `argus/orchestrator/health.py`
+    - ❌ `health.py` (no repo prefix; ambiguous)
+
+    The path prefix `frontend/` does not exist in the ARGUS repo; the
+    canonical path prefix is `argus/ui/src/...`. Empirical anchor: Sprint
+    31.92.65 Round 2 verdict caught 4 instances of `frontend/` and 1 instance
+    of `Layout.tsx` (which doesn't exist; the actual mount path is
+    `AppShell.tsx`).
+
+    When a sprint-spec.md author cites a new file path, they must verify via:
+
+        test -f <cited-path> && echo "OK" || echo "DRIFT — investigate"
+
+    DRIFT outcomes route to the `phase-a-api-surface-audit.md` Section 1 row
+    as Status=DRIFT, gating Phase B until resolved.
