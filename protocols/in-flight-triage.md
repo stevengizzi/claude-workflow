@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.4.0 -->
-<!-- last-updated: 2026-05-10 -->
+<!-- workflow-version: 1.5.0 -->
+<!-- last-updated: 2026-05-12 -->
 # Protocol: In-Flight Triage
 
 **Context:** Claude.ai conversation (Sprint Work Journal)
@@ -156,6 +156,48 @@ for surfacing operator path-decision needs in the LITE refresh prose AND
 for sequencing the operator's response into the affected downstream
 sessions.
 
+### Canonical-artifact cross-check (canonical per Sprint 31.92.7)
+
+Per-session register refreshes face a recurring failure class: register
+content sourced from informal labels (operator nicknames for FAI entries,
+shorthand RSK references in chat) or from chat-event context (test-count
+deltas in operator pings, scope summaries in mid-session questions) drifts
+from the canonical sprint-package state. Sprint 31.92.7's Work Journal
+logged 3 explicit self-corrections + 1 implicit during in-flight
+execution, all attributable to register content sourced informally rather
+than against canonical sprint-package artifacts.
+
+**Required cross-check, every refresh:** before writing the refreshed
+register, explicitly cross-reference the following sprint-package
+artifacts against the corresponding register sections:
+
+| Register section | Canonical source artifact | Failure mode if skipped |
+|---|---|---|
+| FAI table rows (status, semantic description) | `<sprint-folder>/fai-inventory.md` (or sprint-spec § Falsifiable Assumption Inventory) | FAI semantic-description mapping errors; fabricated status; missed entries (Sprint 31.92.7 Refresh #6) |
+| RSK table rows | Design summary § Risk Register OR Phase A/B planning notes filing-time entries | RSKs never tracked despite planning-time filing (Sprint 31.92.7 Refresh #10) |
+| Carry-forward target attribution | Sprint-spec § Session Order + per-session scope blocks | Carry-forward attributed to wrong session (Sprint 31.92.7 Refresh #13) |
+| Residual-AC / residual-CF counts | Sprint-spec AC enumeration + prior register state | Count inflation against actual residual set (Sprint 31.92.7 IMP-12.5 scoping) |
+
+The cross-check is structurally upstream of writing the refreshed register
+content — perform it before authoring the refresh, not after. If the
+canonical sprint-package artifact disagrees with prior register state,
+the artifact wins (extension of subsection 5's existing rule: "the
+artifact wins" applies to both work-journal-vs-register conflicts AND
+register-vs-sprint-package-artifact conflicts).
+
+**Operator-visibility signal:** when the cross-check surfaces a register
+discrepancy that required correction, surface it in the refresh's "Last
+refresh metadata" prose with a one-line correction note (e.g., "FAI-7-3
+status corrected from 'measured-only' to 'falsified-OK' against
+fai-inventory.md cross-check"). This trains operator pattern-recognition
+for future refresh quality without amplifying register-correction
+overhead.
+
+The canonical-artifact cross-check is the register-refresh equivalent of
+RULE-038's session-start grep-verification of factual claims — treat
+informal labels and chat-event context as directional input requiring
+artifact-side verification, not as ground truth.
+
 ## Issue Categories
 
 ### Category 1: In-Session Bug
@@ -278,6 +320,63 @@ Sessions self-select rigor level based on session score + production
 code surface size. Level 3 is recommended for sessions touching
 safety-critical paths (per RULE-040 in ARGUS `.claude/rules/universal.md`
 v054+).
+
+---
+
+## Non-Substantive Artifact Separation
+
+### Spike-results JSON git-hygiene (canonical from Sprint 31.92.7)
+
+Spike-results JSON files (canonical example: `scripts/spike-results/*.json`)
+and other non-substantive operator-tooling artifacts that rebaseline
+through normal sprint execution should commit in their own **chore
+commit**, separate from the session's feat/impl commit. Sprint 31.92.7 S8
+surfaced an instance where spike-results auto-refresh was folded into a
+feat commit, conflating intentional code changes with mechanical artifact
+rebaselines and muddying the commit's review surface.
+
+**Default disposition: chore-isolate.** Stage the substantive work, commit
+it; then stage the auto-refresh artifacts, commit those separately, both
+under the same session:
+
+```bash
+# Session's substantive work
+git add argus/execution/order_manager.py tests/execution/test_buffer.py
+git commit -m "feat(execution): add out-of-order fill buffer (Sprint 31.92.7 S7)"
+
+# Spike-results auto-refresh (separate commit)
+git add scripts/spike-results/*.json
+git commit -m "chore(spike-results): rebaseline post-S7 buffer integration"
+
+git push origin main
+```
+
+**Composes with `templates/implementation-prompt.md` § F3 disposition
+flexibility** (canonical from Sprint 31.92.6): F3 establishes that spike-
+results drift can be chore-isolate OR fold-into-feature OR fold-into-
+correction-commit; this canonical-default selects **chore-isolate** as the
+recommended disposition, consistent with Sprint 31.92.6's 58% dominance
+observation. fold-into-feature is reserved for cases where the artifact
+is structurally integral to the session scope (e.g., AC-validation work
+where the JSON IS the validation output).
+
+**Exceptions — fold-into-feature when:**
+
+- The artifact is the session's deliverable (not a rebaseline side-effect).
+- AC validation output is captured in the JSON and the session's scope IS
+  the AC validation.
+- Operator pre-applies the fold-into-feature disposition at sprint-
+  planning time (Phase A operator decision).
+
+Session close-outs should explicitly disclose the disposition under the
+§ Commit + Push subsection (e.g., "two-commit split: feat + chore" or
+"single-commit fold: rationale...") so the disposition is auditable in
+the close-out trail.
+
+The chore-isolate default keeps commit review surfaces clean and the
+artifact-vs-substantive distinction auditable. This is the non-
+substantive analog of RULE-006 ("one session, one objective"): one
+commit, one purpose.
 
 ---
 
