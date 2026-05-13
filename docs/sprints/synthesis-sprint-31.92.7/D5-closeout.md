@@ -90,4 +90,7 @@ None. AR-1, AR-2, AR-3 all landed. D6 will add RULE-057 (forward-reference resol
 
 ## Commit + Push
 
-(filled in below)
+- **Commit SHA:** `02dbc6a4e8e1f597af52db4ae55ddc4dbba00b4d`
+- **Commit subject:** `[synthesis-sprint-31.92.7 / D5] Amend protocols/adversarial-review.md (3 new H2 sections)`
+- **Push:** `git push origin main` → `1e17e29..02dbc6a  main -> main`
+- **Push parity:** `git log --oneline origin/main..HEAD` → empty (parity OK)
