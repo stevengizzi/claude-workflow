@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-05-12 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-05-14 -->
 # Round-N Surgical-Fix Summary Template
 
 > **Purpose:** Canonical structure for documenting the surgical-fix pass following a Round-N adversarial review verdict of REVISE (surgical-class).
@@ -68,9 +68,12 @@ For surgical-fix passes that touch ONLY documentation (no production-code edits)
 
 For surgical-fix passes that touch production code (rare; usually ≤2 architectural edge cases):
 
-| Production-code surface | File:line | Re-verified at SHA |
-|---|---|---|
-| `<symbol>` | `<path:line>` | `<SHA>` |
+| Production-code surface | File:line | Status | Re-verified at SHA |
+|---|---|---|---|
+| `<symbol>` | `<path:line>` | VERIFIED-SIGNATURE | `<SHA>` |
+| `<symbol>` body behavior | `<path:line>` | VERIFIED-BODY | `<SHA>` |
+
+The **Status** column uses the canonical Phase A status enum (`VERIFIED-SIGNATURE` / `VERIFIED-BODY` / `NEW` / `NEW (body; symbol pre-exists)` / `DRIFT`) defined in `templates/phase-a-api-surface-audit.md` § Status values. Because a surgical-fix pass that touches production code lands the fix *in code*, surfaces here are normally `VERIFIED-SIGNATURE` or `VERIFIED-BODY` at the re-verified SHA — the code matches the spec mandate (the Round-N adversarial-review prompt's "Mode B" verification). Record the SHA the grep evidence was captured at; the status is only valid at that SHA.
 
 ## Section 5 — Workflow-Protocol Gaps Confirmed
 

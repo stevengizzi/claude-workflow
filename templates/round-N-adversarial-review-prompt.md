@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-05-12 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-05-14 -->
 # Round-N Adversarial Review Prompt Template (N ≥ 2)
 
 > **Purpose:** Canonical structure for adversarial review prompts at Round-N where N ≥ 2 (verification rounds, NOT fresh review). Round-1 uses a different shape; this template is for verification.
@@ -32,10 +32,27 @@ Before reviewing, the reviewer must:
 
 For every concern in the Round-(N-1) verdict, the reviewer must verify the disposition documented in the revision summary holds against the actual repo state:
 
-- **ABSORBED concerns:** verify the cited AMD ID landed by inspecting the commit + verifying production-code surfaces match.
+- **ABSORBED concerns:** verify the cited AMD ID landed by inspecting the commit + verifying production-code surfaces per the verification mode below.
 - **AUTO-RESOLVED concerns:** verify the absorbing AMD addresses both the original concern and the downstream symptom.
 - **PARTIAL concerns:** verify the documented gap matches the actual residual; the carry-forward is correctly filed.
 - **NOT-ADDRESSED concerns:** verify the rationale is sound; the carry-forward (RSK or similar) is filed.
+
+### Task 1 verification mode — anchor-SHA-aware "expect at HEAD" semantics (W-R2-NEW-1)
+
+**Sprint-package documents and production code can live on different anchor SHAs within the same sprint.** A revision pass may touch docs-only — leaving production code intentionally pre-revision — while the sprint package advances. A verification block phrased as "expect at HEAD" is ambiguous: it conflates *"production code at HEAD contains X"* with *"the spec mandates X."* A reviewer reading it literally against a sprint-package-only commit would observe pre-revision code at the cited surface and could falsely conclude an amendment's absorption is incomplete.
+
+The prompt author **MUST label every production-code verification block with one of two modes** (auto-detect by inspecting whether the Round-(N-1) revision-pass commit modified production-code paths):
+
+- **Mode A — Sprint-package-only revision pass (most common for Round-N where N ≥ 2):** production code at the anchor SHA is **expected to remain pre-revision**. Verification asserts the SPEC mandates the post-revision state at implementation time. Phrase as: *"confirm spec mandates `broker_shares` + `argus_expected_shares` keys; production code at anchor expected to remain pre-revision pending implementation."* Do **not** phrase as "expect at HEAD."
+- **Mode B — Surgical-fix pass that touched production code:** production code at the anchor SHA reflects the surgical fix. Verification asserts the code matches the spec mandate. Phrase as: *"confirm production code at lines 2787–2803 includes the new metadata keys."*
+
+Each verification line carries an explicit status enum mirroring `templates/round-N-revision-summary.md` Section 6:
+
+- `SPEC-MANDATED` — spec requires this state; production code at anchor expected pre-revision (Mode A).
+- `CODE-VERIFIED` — production code at anchor matches the spec mandate (Mode B).
+- `CITED-AS-NEW` — surface does not yet exist; this-sprint-adds at implementation time.
+
+This keeps producer-author and reviewer-consumer on the same page and prevents false-positive Major findings against intentionally-unchanged production code.
 
 Per-concern verification produces one line per concern in the reviewer's Round-N output:
 

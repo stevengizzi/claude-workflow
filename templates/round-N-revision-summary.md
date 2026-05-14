@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-05-12 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-05-14 -->
 # Round-N Revision Summary Template
 
 > **Purpose:** Canonical structure for documenting the revision pass following a Round-N adversarial review verdict of REVISE (non-surgical-class).
@@ -85,11 +85,17 @@ If no scope changes affected compaction risk, state: "No compaction-risk shifts 
 
 Table form. Per RULE-038 (session-start grep-verification of factual claims) extended to revision-pass output:
 
-| Cited name | File:line | Pre-revision claim | Post-revision verification |
+| Cited name | File:line | Status | Grep evidence (captured at revision-pass-end Anchor SHA) |
 |---|---|---|---|
-| `_mechanism_a_post_cancel_recheck` | `order_manager.py:2555` | Cited; not verified | `grep -n "def _mechanism_a_post_cancel_recheck" argus/execution/order_manager.py` → 1 hit at L2555 ✓ |
-| `ActiveAlert.occurrence_count` | `health.py:101-122` | Cited as NEW | `grep -n "occurrence_count" argus/orchestrator/health.py` → 0 hits (NEW; this-sprint-adds) ✓ |
+| `_mechanism_a_post_cancel_recheck` | `order_manager.py:2555` | VERIFIED-SIGNATURE | `grep -n "def _mechanism_a_post_cancel_recheck" argus/execution/order_manager.py` → 1 hit at L2555 ✓ |
+| fill-metadata dict `broker_shares` key | `order_manager.py:2787-2803` | VERIFIED-BODY | `sed -n '2787,2803p' argus/execution/order_manager.py \| grep broker_shares` → 1 hit ✓ |
+| `ActiveAlert.occurrence_count` | `health.py:101-122` | NEW | `grep -n "occurrence_count" argus/orchestrator/health.py` → 0 hits (this-sprint-adds) ✓ |
+| fill-metadata dict `argus_expected_shares` key | `order_manager.py:2787-2803` | NEW (body; symbol pre-exists) | `sed -n '2787,2803p' argus/execution/order_manager.py \| grep argus_expected_shares` → 0 hits (this-sprint-adds to existing method body) ✓ |
 | ... | ... | ... | ... |
+
+The **Status** column uses the canonical Phase A status enum (`VERIFIED-SIGNATURE` / `VERIFIED-BODY` / `NEW` / `NEW (body; symbol pre-exists)` / `DRIFT`) defined in `templates/phase-a-api-surface-audit.md` § Status values. Using the same vocabulary keeps this re-verification table consistent with the Phase A artifact and prevents anchor-SHA misreads (W-NEW-1): the status makes verification *scope* explicit (symbol/signature vs body-contents), and `NEW (body; symbol pre-exists)` is the correct status when an amendment adds behavior to an existing symbol's body — a bare `VERIFIED` there would let a reviewer at a later anchor SHA observe pre-revision code and falsely conclude absorption is incomplete.
+
+Record the **revision-pass-end Anchor SHA** (Frontmatter) alongside this table — the grep evidence is only valid at that SHA.
 
 This section satisfies the Phase A API-surface verification artifact contract (W-2; codified at RULE-056). The verification table here is the post-revision update; the artifact at `phase-a-api-surface-audit.md` is the pre-Phase-B canonical version.
 

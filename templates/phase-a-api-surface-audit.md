@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.0.0 -->
-<!-- last-updated: 2026-05-12 -->
+<!-- workflow-version: 1.1.0 -->
+<!-- last-updated: 2026-05-14 -->
 # Phase A API-Surface Audit Template
 
 > **Purpose:** The mandatory Phase A artifact codifying every production-code API name, class, field, file path, and ABC method cited in the sprint package. Failure to produce this artifact at Phase A gates Phase B.
@@ -28,18 +28,24 @@ Every name cited in any Phase A sprint-package artifact (joint design summary, s
 
 | Cited name | Type | Production-code location | Verified at SHA | Status |
 |---|---|---|---|---|
-| `_mechanism_a_post_cancel_recheck` | function | `argus/execution/order_manager.py:2555` | `abc1234` | VERIFIED |
+| `_mechanism_a_post_cancel_recheck` | function | `argus/execution/order_manager.py:2555` | `abc1234` | VERIFIED-SIGNATURE |
+| `order_manager.py` fill-metadata dict | method body | `argus/execution/order_manager.py:2787-2803` (`broker_shares` key present) | `abc1234` | VERIFIED-BODY |
 | `ActiveAlert.occurrence_count` | dataclass field | `argus/orchestrator/health.py:101-122` (NEW — this-sprint-adds) | `abc1234` | NEW |
-| `broker.get_positions()` | ABC method | `argus/brokers/broker.py:112` (no-arg signature) | `abc1234` | VERIFIED |
+| `order_manager.py` fill-metadata dict | method body | `argus/execution/order_manager.py:2787-2803` (`argus_expected_shares` key — this-sprint-adds to existing method body) | `abc1234` | NEW (body; symbol pre-exists) |
+| `broker.get_positions()` | ABC method | `argus/brokers/broker.py:112` (no-arg signature) | `abc1234` | VERIFIED-SIGNATURE |
 | `bus.emit()` | method | DRIFT — actual: `EventBus.publish()` at `argus/core/event_bus.py:73` | `abc1234` | **DRIFT** |
 | ... | ... | ... | ... | ... |
 
 ### Type values
-- `function`, `method`, `class`, `dataclass field`, `attribute`, `ABC method`, `file path`, `enum value`, `constant`, `config field`
+- `function`, `method`, `class`, `dataclass field`, `attribute`, `ABC method`, `method body`, `file path`, `enum value`, `constant`, `config field`
 
 ### Status values
-- **VERIFIED** — cited name exists in production code at cited location with cited signature/shape.
-- **NEW** — cited name does NOT exist in production code; this sprint will add it. Location indicates planned post-sprint location.
+
+The `VERIFIED` status is split into two (W-NEW-1) because a single `VERIFIED` conflates *"the symbol exists with the cited signature"* with *"the symbol's body contains the cited behavior."* When sprint-package documents and production code live on different anchor SHAs within a sprint, a reviewer reading a bare `VERIFIED` literally could observe pre-revision code at the cited surface and falsely conclude an amendment's absorption is incomplete. The classification must make the verification *scope* explicit.
+
+- **VERIFIED-SIGNATURE** — cited name exists in production code at cited location with the cited signature/shape. The symbol's *body contents* are NOT asserted by this row. Use when the citation references only the symbol's existence or signature (e.g., "call `broker.get_positions()`", "`ActiveAlert` dataclass exists").
+- **VERIFIED-BODY** — cited name exists AND its implementation body contains the cited behavior or state at the Anchor SHA. Use when the citation references behavior *inside* the body (e.g., "the fill-metadata dict at `order_manager.py:2787` includes the `broker_shares` key"). VERIFIED-BODY implies VERIFIED-SIGNATURE.
+- **NEW** — cited name does NOT exist in production code at the Anchor SHA; this sprint will add it. Location indicates planned post-sprint location. If the *symbol* pre-exists but the cited *body behavior* is this-sprint-adds, classify as `NEW (body; symbol pre-exists)` — do NOT classify VERIFIED-*, since the cited body state is not present at the Anchor SHA.
 - **DRIFT** — cited name does NOT exist as cited. Actual name + location specified. DRIFT rows **gate Phase B until resolved** (i.e., the citing artifact must be corrected to use the actual name OR the rationale for the NEW-vs-DRIFT classification must be re-evaluated).
 
 ## Section 2 — DRIFT Resolution (mandatory if any DRIFT rows)
@@ -58,7 +64,8 @@ If Section 2 contains ≥1 row, the Phase A audit must be re-run after correctio
 The Phase A author asserts:
 
 - [ ] Every production-code name cited in any Phase A artifact appears in Section 1.
-- [ ] All Section 1 rows are classified VERIFIED, NEW, or DRIFT.
+- [ ] All Section 1 rows are classified VERIFIED-SIGNATURE, VERIFIED-BODY, NEW, or DRIFT.
+- [ ] Every body-level citation (behavior cited *inside* a symbol's implementation) is classified VERIFIED-BODY or NEW — not VERIFIED-SIGNATURE.
 - [ ] All DRIFT rows have been resolved (Section 2).
 - [ ] All resolution commits are confirmed against `origin/main`.
 - [ ] Phase B may now proceed.
@@ -86,16 +93,24 @@ grep -nE "abstractmethod" <expected-file> -A 5 | grep "<name>"
 # For file paths:
 ls <path>
 test -f <path>
+
+# For body-level behavior (VERIFIED-BODY vs NEW-body discrimination):
+# the signature grep above confirms the symbol exists; a second grep
+# confirms whether the cited behavior is present in the body at the Anchor SHA.
+sed -n '<start>,<end>p' <expected-file> | grep -nE "<cited-body-token>"
 ```
 
-Output verification: the grep returns ≥1 hit with the expected line number, OR the audit author classifies the row as NEW or DRIFT.
+Output verification:
+- **Signature-level citation:** the signature grep returns ≥1 hit at the expected line → `VERIFIED-SIGNATURE`; 0 hits → `NEW` or `DRIFT`.
+- **Body-level citation:** the signature grep confirms the symbol exists, then the body grep confirms the cited token/behavior is present at the Anchor SHA → `VERIFIED-BODY`; symbol present but body token absent → `NEW (body; symbol pre-exists)`; symbol absent → `NEW` or `DRIFT`.
 
 ## Section 5 — Cross-Reference to Other Sprint Artifacts
 
 This audit table is reproduced (or summarized) in the following downstream artifacts:
 
-- **Sprint-spec.md** § Production-Code Surfaces — verbatim copy of VERIFIED + NEW rows.
+- **Sprint-spec.md** § Production-Code Surfaces — verbatim copy of VERIFIED-SIGNATURE + VERIFIED-BODY + NEW rows.
 - **Round-N revision summaries** § Production-Code Surfaces Re-Verified by Grep — re-verification table per revision pass.
+- **Round-N adversarial-review prompts** Task 1 verification blocks — the VERIFIED-SIGNATURE / VERIFIED-BODY / NEW scope distinction maps to the prompt-side `CODE-VERIFIED` / `SPEC-MANDATED` / `CITED-AS-NEW` enum; both encode the same anchor-SHA-aware verification semantics (W-NEW-1 / W-R2-NEW-1, shared root cause).
 
 The Phase A audit is the canonical source; downstream artifacts cite back to it.
 

@@ -441,9 +441,9 @@ RULE-056: Phase A API-surface verification artifact non-bypassable (canonical pe
 
 **Non-bypassable contract:**
 
-- Each cited name in Phase A artifacts is classified VERIFIED / NEW / DRIFT in the audit.
+- Each cited name in Phase A artifacts is classified VERIFIED-SIGNATURE / VERIFIED-BODY / NEW / DRIFT in the audit. The two VERIFIED statuses make verification scope explicit (symbol/signature vs body-contents) so the audit is not misread at a later anchor SHA (W-NEW-1).
 - **DRIFT rows GATE Phase B.** Phase B is structurally blocked until all DRIFT rows are RESOLVED (citing artifact corrected; resolution commit SHA recorded in the audit's Section 2).
-- The Phase A author asserts completion via the audit's Section 3 checklist. Phase B is structurally blocked until all four checkboxes resolve.
+- The Phase A author asserts completion via the audit's Section 3 checklist. Phase B is structurally blocked until all Section 3 checkboxes resolve.
 
 **Why non-bypassable:** the 4-consecutive-sprint empirical anchor is overwhelming. Each Round-1 verdict's Critical misses cost an adversarial-review cycle to surface; the mandatory artifact's ~30-minute Phase A cost is amortized across every cycle it eliminates. Sprint 31.92.8 onward is the inaugural test of this rule's effect.
 
@@ -451,6 +451,8 @@ RULE-056: Phase A API-surface verification artifact non-bypassable (canonical pe
 - Canonical template: `templates/phase-a-api-surface-audit.md`
 - Protocol binding: `protocols/sprint-planning.md` Phase A §API-Surface Verification
 - Synthesis origin: synthesis-sprint-31.92.7 D6.
+
+**Amended 2026-05-14 (W-NEW-1):** `VERIFIED` status split into `VERIFIED-SIGNATURE` and `VERIFIED-BODY` to make verification scope (symbol/signature vs body-contents) explicit. Shared root cause with W-R2-NEW-1 (anchor-SHA-aware verification language in `templates/round-N-adversarial-review-prompt.md` Task 1).
 
 ---
 

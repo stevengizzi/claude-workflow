@@ -1,5 +1,5 @@
-<!-- workflow-version: 1.6.0 -->
-<!-- last-updated: 2026-05-12 -->
+<!-- workflow-version: 1.6.1 -->
+<!-- last-updated: 2026-05-14 -->
 # Protocol: Sprint Planning
 
 **Context:** Claude.ai conversation(s)
@@ -271,9 +271,9 @@ work-driven overage at S5b).
 2. The artifact enumerates **every production-code name** cited in any Phase A artifact:
    - functions / methods / classes / dataclass fields / attributes / ABC methods
    - file paths / config field names / enum values / constants
-3. Each row is classified VERIFIED / NEW / DRIFT per the template.
+3. Each row is classified VERIFIED-SIGNATURE / VERIFIED-BODY / NEW / DRIFT per the template. The two VERIFIED statuses make verification *scope* explicit — signature/existence vs body-contents — so a reviewer reading the audit at a later anchor SHA does not mistake a pre-revision body for incomplete absorption (W-NEW-1).
 4. **DRIFT rows GATE Phase B.** Phase B cannot proceed until all DRIFT rows are RESOLVED (citing artifact corrected + resolution commit SHA recorded in the audit artifact's Section 2).
-5. The Phase A author asserts completion via the audit artifact's Section 3 checklist. Phase B is structurally blocked until all four checkboxes resolve.
+5. The Phase A author asserts completion via the audit artifact's Section 3 checklist. Phase B is structurally blocked until all Section 3 checkboxes resolve.
 
 **Why this is non-bypassable:**
 
